@@ -39,7 +39,7 @@ terminaltables
 ucr==0.2.16
 sentence-transformers==2.0.0
 happytransformer==2.3.1
-nltk==3.2.4
+nltk==3.6.5
 sentencepiece==0.1.96
 pytorch-crf==0.7.2
 seqeval==1.2.2

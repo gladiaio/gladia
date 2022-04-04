@@ -20,4 +20,4 @@ output = {
 
 router = APIRouter()
 
-TaskRouter(router=router, input=inputs, output=output, default_model="rembg")
+TaskRouter(router=router, input=inputs, output=output, default_model="xception")

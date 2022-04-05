@@ -29,3 +29,4 @@ h5py==2.10.0
 pipenv==2022.1.8
 easyargs==0.9.4
 exitstatus==2.1.0
+pattern==3.6

@@ -2,7 +2,6 @@ import torch
 
 from transformers import BertTokenizer, BertForSequenceClassification
 
-
 def predict(text: str) -> str:
     """
     Detect hate from a given text
@@ -21,8 +20,10 @@ def predict(text: str) -> str:
 
     tokenizer = BertTokenizer.from_pretrained(model_name)
 
-    inputs = tokenizer(text, return_tensors="pt")
+    input = tokenizer(text, return_tensors="pt")
 
-    outputs = model(**inputs)
+    input = input.to(device)
+
+    outputs = model(**input)
 
     return labels[torch.argmax(outputs.logits, dim=1)]

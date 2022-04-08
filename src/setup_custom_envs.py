@@ -16,8 +16,6 @@ os.environ["PIPENV_VENV_IN_PROJECT"] = os.getenv('PIPENV_VENV_IN_PROJECT', 'enab
 @click.option('-s', '--simlink', type=bool, default=False, help="Will simlink gladia-api-utils from the local version of gladia-api-utils")
 @click.option('-f', '--force', type=bool, default=False, help="Force rebuilding venv")
 def main(rootdir, poolsize, simlink, force):
-    print(force)
-    print(simlink)
     if poolsize == 0:
         pool = Pool(multiprocessing.cpu_count())
     else:
@@ -42,7 +40,6 @@ def build_env(dirName, subdirList, fileList, simlink, force):
 
             build = True
             if os.path.exists(os.path.join(dirName, '.venv')):
-                print("existing .venv found")
                 if force == True:
                     try:
                         os.system(f"cd {dirName} && rm -rf .venv Pipfile")
@@ -55,14 +52,16 @@ def build_env(dirName, subdirList, fileList, simlink, force):
             if build == True:
                 packages_to_install = ' '.join(env_yaml['packages'])
 
-                if simlink:
+                if not simlink:
                     packages_to_install += ' gladia-api-utils'
             
                 os.system(f"cd {dirName} && echo Y | pipenv --python {env_yaml['python']['version']}")
                 os.system(f"cd {dirName} && pipenv run pip install {packages_to_install}")
 
-                if simlink:
-                    os.system(f"ln -s /opt/conda/lib/python3.7/site-packages/gladia_api_utils {dirName}/.venv/lib/python3.7/site-packages/gladia_api_utils")
+            if simlink:
+                print(f"Applying Simlink to {dirName}/.venv/lib/python3.7/site-packages/gladia_api_utils")
+                os.system(f"rm -rf {dirName}/.venv/lib/python3.7/site-packages/gladia_api_utils")
+                os.system(f"ln -s /opt/conda/lib/python3.7/site-packages/gladia_api_utils {dirName}/.venv/lib/python3.7/site-packages/gladia_api_utils")
 
 
 if __name__ == '__main__':

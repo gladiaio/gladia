@@ -10,8 +10,8 @@ os.environ["PIPENV_VENV_IN_PROJECT"] = os.getenv('PIPENV_VENV_IN_PROJECT', 'enab
 @click.command()
 @click.option('-r', '--rootdir', type=str, default='apis', help="Build env recursively from the provided directory path")
 @click.option('-p', '--poolsize', type=int, default=0, help="Parallelness if set to 0 will use all threads")
-def main(rootdir, poolsize):
-
+@click.option('-s', '--simlink', type=bool, default=False, help="Will simlink gladia-api-utils from the local version of gladia-api-utils")
+def main(rootdir, poolsize, simlink):
     if poolsize == 0:
         pool = Pool(multiprocessing.cpu_count())
     else:
@@ -22,6 +22,7 @@ def main(rootdir, poolsize):
 
     pool.close()
     pool.join()
+
 
 def build_env(dirName, subdirList, fileList):
     if 'env.yaml' in fileList:
@@ -40,9 +41,16 @@ def build_env(dirName, subdirList, fileList):
             except:
                 print("Could not remove .env and Pipfile")
 
-            packages_to_install = ' '.join(env_yaml['packages']) + ' gladia-api-utils'
+            if simlink:
+                packages_to_install = ' '.join(env_yaml['packages'])
+            else:
+                packages_to_install = ' '.join(env_yaml['packages']) + ' gladia-api-utils'
+
             os.system(f"cd {dirName} && echo Y | pipenv --python {env_yaml['python']['version']}")
             os.system(f"cd {dirName} && pipenv run pip install {packages_to_install}")
+
+            if simlink:
+                os.system(f"ln -s /opt/conda/lib/python3.7/site-packages/gladia_api_utils {dirName}/.venv/lib/python3.7/site-packages/gladia_api_utils")
 
 
 if __name__ == '__main__':

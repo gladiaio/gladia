@@ -15,8 +15,7 @@ RUN pip3 install git+https://github.com/gladiaio/gladia-api-utils.git\@$GLADIA_A
 
 RUN pip3 uninstall -y botocore transformers
 RUN pip3 install botocore transformers
-RUN pip3 uninstall -y pyarrow
-RUN pip3 install pyarrow>=5.0.0
+
 RUN rm /tmp/clean-layer.sh
 
 ENV PIPENV_VENV_IN_PROJECT="enabled"

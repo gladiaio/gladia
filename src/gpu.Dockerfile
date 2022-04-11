@@ -33,7 +33,7 @@ WORKDIR /app
 
 # add build options to setup_custom_envs
 # can be -f to force rebuild of env if already exist
-ARG SETUP_CUSTOM_ENV_BUILD_MODE=""
+ARG SETUP_CUSTOM_ENV_BUILD_MODE=" -p 1 "
 RUN python3 setup_custom_envs.py $SETUP_CUSTOM_ENV_BUILD_MODE
 
 # import omw

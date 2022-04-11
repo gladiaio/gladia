@@ -99,7 +99,7 @@ def perform_test(details, url, header, path, skip_when_failed):
 
 
 @easyargs
-def main(url, bearer_token='', specific_endpoints=None, skip_when_failed=True):
+def main(url, bearer_token='', specific_endpoints=None, skip_when_failed=True, after_endpoint=""):
     if specific_endpoints:
         specific_endpoints = specific_endpoints.split(',')
     else:
@@ -122,11 +122,37 @@ def main(url, bearer_token='', specific_endpoints=None, skip_when_failed=True):
     nb_test_ran = 0
     nb_total_tests = get_nb_tests(url, header, endpoints, specific_endpoints)
 
+    after_endpoint_continue = False
     test_final_status = ExitStatus.success
     for path, details  in endpoints['paths'].items():
         print(f"|__ {path}")
         if specific_endpoints:
             if path in specific_endpoints:
+                perform_test(details, url, header, path, skip_when_failed)
+                nb_test_ran += 1
+
+            elif after_endpoint != "":
+                if path in after_endpoint:
+                    after_endpoint_continue = True
+                    
+                if after_endpoint_continue:
+                    perform_test(details, url, header, path, skip_when_failed)
+                    nb_test_ran += 1
+                else:
+                    print(f"|  |__ {status_skipped}  <Skipped>")
+                    print(f"|")
+                    nb_test_skipped += 1
+
+            else:
+                print(f"|  |__ {status_skipped}  <Skipped>")
+                print(f"|")
+                nb_test_skipped += 1
+
+        elif after_endpoint != "":
+            if path in after_endpoint:
+                 after_endpoint_continue = True
+                    
+            if after_endpoint_continue:
                 perform_test(details, url, header, path, skip_when_failed)
                 nb_test_ran += 1
             else:
@@ -136,6 +162,7 @@ def main(url, bearer_token='', specific_endpoints=None, skip_when_failed=True):
         else:
             perform_test(details, url, header, path, skip_when_failed)
             nb_test_ran += 1
+
     if test_final_status == ExitStatus.success:
         str_final_status = "Success"
     else:

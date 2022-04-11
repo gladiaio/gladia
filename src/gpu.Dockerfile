@@ -33,6 +33,7 @@ WORKDIR /app
 
 # add build options to setup_custom_envs
 # can be -f to force rebuild of env if already exist
+# -p 1 is set by default for stability purposes
 ARG SETUP_CUSTOM_ENV_BUILD_MODE=" -p 1 "
 RUN python3 setup_custom_envs.py $SETUP_CUSTOM_ENV_BUILD_MODE
 

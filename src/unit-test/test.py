@@ -1,10 +1,10 @@
-import easyargs
-from time import sleep
-import json
 import sys
-
 import requests
+import easyargs
+
+from time import sleep
 from exitstatus import ExitStatus
+
 
 global nb_total_tests
 global nb_test_ran, nb_test_passed, nb_test_failed, nb_test_skipped

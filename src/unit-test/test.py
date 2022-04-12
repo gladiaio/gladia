@@ -1,3 +1,4 @@
+import os
 import sys
 import requests
 import easyargs
@@ -62,7 +63,10 @@ def perform_test(details, url, header, path, skip_when_failed):
     models = response.json()
     
     for model in models:
-        sleep(1)
+
+        if os.getenv("BACKEND") == "CI":
+            sleep(1)
+
         input, output, task = details['post']['tags'][0].split('.')
         status = ""
 
@@ -194,5 +198,8 @@ def main(url, bearer_token='', specific_endpoints=None, skip_when_failed=True, a
     """)
     sys.exit(test_final_status)
 
+
 if __name__ == '__main__':
+    os.environ["BACKEND"] = os.getenv("BACKEND", "CI")
+
     main()

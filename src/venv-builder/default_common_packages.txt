@@ -1,5 +1,5 @@
 tensorflow_gpu==2.8.0
-gladia-api-utils
+../api_utils/
 pandas==1.3.5
 gdown==4.4.0
 python-magic==0.4.25

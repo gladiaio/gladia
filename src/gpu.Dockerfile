@@ -121,15 +121,14 @@ SHELL ["/opt/conda/bin/conda", "run", "-n", "base", "/bin/bash", "-c"]
 WORKDIR /app
 # install python package
 RUN for package in $(cat /app/requirements.txt); do echo "================="; echo "installing ${package}"; echo "================="; pip3 install $package; done && \
-    pip3 uninstall -y gladia-api-utils && \
+    pip3 install -e ./api_utils/ && \
     pip3 uninstall -y botocore transformers && \
     pip3 install botocore transformers && \
     sh /app/clean-layer.sh && \
     rm /app/clean-layer.sh
 
 
-RUN pip3 install pipenv nltk git+https://github.com/gladiaio/gladia-api-utils.git\@$GLADIA_API_UTILS_BRANCH && \
-    if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then cd /app/venv-builder && python setup_custom_envs.py -x -r /app/apis/ && python setup_custom_envs.py $SETUP_CUSTOM_ENV_BUILD_MODE; fi && \
+RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then cd /app/venv-builder && python setup_custom_envs.py -x -r /app/apis/ && python setup_custom_envs.py $SETUP_CUSTOM_ENV_BUILD_MODE; fi && \
     if [ "$SKIP_ROOT_CACHE_CLEANING" = "false" ]; then [ -d "/root/.cache/" ] && rm -rf "/root/.cache/*"; fi && \
     if [ "$SKIP_PIP_CACHE_CLEANING" = "false" ]; then rm -rf "/tmp/pip*"; fi && \
     if [ "$SKIP_YARN_CACHE_CLEANING" = "false" ]; then rm -rf "/tmp/yarn*"; fi && \

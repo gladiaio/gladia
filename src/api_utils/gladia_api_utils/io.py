@@ -87,8 +87,6 @@ def to_pandas(buffer):
         raiseExceptions("Not implemented Yet")
     elif buffer_mime_type == "spss":
         raiseExceptions("Not implemented Yet")
-    elif buffer_mime_type == "spss":
-        raiseExceptions("Not implemented Yet")
     elif buffer_mime_type == "pickle":
         raiseExceptions("Not implemented Yet")
 

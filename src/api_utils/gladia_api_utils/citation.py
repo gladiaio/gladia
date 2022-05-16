@@ -14,7 +14,7 @@ def get_doi(doi: str) -> dict:
 
 
 def get_arxiv(arxiv_id: str) -> dict:
-    arxiv_url = f"http://export.arxiv.org/api/query?search_query={arxiv_id}&start=0&max_results=1"
+    arxiv_url = f"https://export.arxiv.org/api/query?search_query={arxiv_id}&start=0&max_results=1"
     req = requests.get(arxiv_url)
     if req.status_code == 200:
         return objectify.fromstring(req.content)

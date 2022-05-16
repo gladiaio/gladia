@@ -145,8 +145,7 @@ def uncompress(path: str, destination=None, delete_after_uncompress=True) -> str
         ic("Extraction Done", output)
         return output
     except:
-        raise (f"Error while uncompressing {path}")
-        return False
+        raise Exception(f"Error while uncompressing {path}")
 
 
 def compress_directory(

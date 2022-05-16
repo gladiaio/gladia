@@ -5,7 +5,7 @@ from lxml import objectify
 
 
 def get_doi(doi: str) -> dict:
-    crossref_url = f"http://api.crossref.org/works/{doi}"
+    crossref_url = f"https://api.crossref.org/works/{doi}"
     req = requests.get(crossref_url)
     if req.status_code == 200:
         return json.loads(req.content)

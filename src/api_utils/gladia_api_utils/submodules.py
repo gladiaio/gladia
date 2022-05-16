@@ -137,9 +137,9 @@ class TaskRouter:
             elif input == "text":
                 input_list.append(forge.arg("text", type=str, default="default Text"))
             elif input == "list":
-                input_list.append(forge.arg("list", type=list), default=list())
+                input_list.append(forge.arg("list", type=list, default=list()))
             elif input == "dict":
-                input_list.append(forge.arg("dict", type=dict), default=dict())
+                input_list.append(forge.arg("dict", type=dict, default=dict()))
 
         elif isinstance(input, list):
             for item in input:

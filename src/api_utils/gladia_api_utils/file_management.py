@@ -1,22 +1,20 @@
-import inspect
-import os
-import random
-import string
-import sys
-from pathlib import Path
-from uuid import uuid4
 import io
-
+import os
+import sys
 import gdown
 import magic
+import string
+import random
 import requests
-from icecream import ic
-from xtract import XZ, BZip2, GZip, Rar, Tar, Zip, xtract
-from xtract.utils import get_file_type
-from google_drive_downloader import GoogleDriveDownloader as gdd
+import tempfile
 
 from PIL import Image
-import tempfile
+from uuid import uuid4
+from icecream import ic
+from pathlib import Path
+from urllib.parse import urlparse
+from xtract.utils import get_file_type
+from xtract import XZ, BZip2, GZip, Rar, Tar, Zip, xtract
 
 
 def write_tmp_file(content):
@@ -472,9 +470,19 @@ def get_buffer_type(buffer) -> str:
     return magic.from_buffer(buffer, mime=True)
 
 
-def random_string(lenght: int) -> str:
+def random_string(lenght: int = 10) -> str:
+    """Generate a random string composed of lower cased ascii characters
+
+    Args:
+        lenght (int, optional): lenght of the string to generate. Defaults to 10.
+
+    Returns:
+        str: random string of lenght `lenght` composed of lower cased ascii characters
+    """
+
     letters = string.ascii_lowercase
-    generated_random_string = "".join(random.choice(letters) for i in range(10))
+
+    generated_random_string = "".join(random.choice(letters) for _ in range(lenght))
 
     return generated_random_string
 

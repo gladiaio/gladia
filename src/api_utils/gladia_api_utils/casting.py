@@ -85,10 +85,7 @@ def cast_response(response, expected_output: dict):
                 ic(f"returning string {response}")
                 return response
         except OSError as oserr:
-            if oserr.errno != errno.ENAMETOOLONG:
-                return response
-            else:
-                return response
+            return response
         
     elif isinstance(response, bool):
         ic(f"converting boolean")

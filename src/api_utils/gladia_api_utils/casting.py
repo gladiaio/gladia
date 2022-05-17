@@ -1,24 +1,23 @@
 import io
 import os
-import pathlib
-import string
-
-import numpy as np
 import PIL
-from fastapi.encoders import jsonable_encoder
+import json
+import pathlib
+import numpy as np
+
+from warnings import warn
+from .file_management import get_file_type
 from fastapi.responses import JSONResponse
-from icecream import ic
+from fastapi.encoders import jsonable_encoder
 from starlette.responses import StreamingResponse
 
-from .file_management import get_file_type
-import json
-import errno
 
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         return json.JSONEncoder.default(self, obj)
+
 
 class NpEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -32,69 +31,114 @@ class NpEncoder(json.JSONEncoder):
             return super(NpEncoder, self).default(obj)
 
 
+def __convert_PIL_Image_response(response: PIL.Image.Image, output_type: str):
+    ioresult = io.BytesIO()
 
-def cast_response(response, expected_output: dict):
+    response.save(ioresult, format="png")
+    ioresult.seek(0)
 
-    if isinstance(response, PIL.Image.Image):
-        ic("converting to pil")
-        ioresult = io.BytesIO()
-        response.save(ioresult, format="png")
+    return StreamingResponse(ioresult, media_type="image/png")
+
+
+def __convert_ndarray_response(response: np.ndarray, output_type: str):
+    if output_type == "image":
+        ioresult = io.BytesIO(response.tobytes())
         ioresult.seek(0)
+
         return StreamingResponse(ioresult, media_type="image/png")
 
+    elif output_type == "text":
+        return JSONResponse(content=jsonable_encoder(response.tolist()))
+
+    else:
+        warn(f"response is numpy array but expected output type {output_type} which is not supported.")
+
+        return response
+
+
+def __convert_bytes_response(response: bytes, output_type: str):
+    ioresult = io.BytesIO(response)
+    ioresult.seek(0)
+
+    if output_type == "image":
+        return StreamingResponse(ioresult, media_type="image/png")
+
+    else:
+        warn(f"response is bytes but expected output type {output_type} which is not supported.")
+
+    return response
+
+
+def __convert_io_response(response: io.IOBase, output_type: str):
+    response.seek(0)
+
+    if output_type == "image":
+        return StreamingResponse(response, media_type="image/png")
+
+    else:
+        warn(f"response is io but expected output type {output_type} which is not supported.")
+
+    return response
+
+
+def __convert_string_response(response: str):
+    if not os.path.exists(response):
+        return response
+
+    try:
+        if pathlib.Path(response).is_file():
+            file_to_stream = open(response, "rb")
+
+            out = StreamingResponse(file_to_stream, media_type=get_file_type(response))
+
+            os.remove(response)
+
+            return out
+
+        else:
+            return response
+
+    except OSError as os_error:
+        warn(f"Couldn't interpret stream: {os_error}")
+
+        return response
+
+
+def cast_response(response, expected_output: dict):
+    """Cast model response to the expected output type
+
+    Args:
+        response (Any): response of the model
+        expected_output (dict): dict describing the expected output
+
+    Returns:
+        Any: Casted response
+    """
+
+    if isinstance(response, PIL.Image.Image):
+        return __convert_PIL_Image_response(response, expected_output["type"])
+
     elif isinstance(response, np.ndarray):
-        if expected_output["type"] == "image":
-            ic("converting to image from numpy")
-            ioresult = io.BytesIO(response.tobytes())
-            ioresult.seek(0)
-            return StreamingResponse(ioresult, media_type="image/png")
-        elif expected_output["type"] == "text":
-            ic("converting to json from numpy")
-            return JSONResponse(content=jsonable_encoder(response.tolist()))
+        return __convert_ndarray_response(response, expected_output["type"])
 
     elif isinstance(response, bytes):
-        ioresult = io.BytesIO(response)
-        ioresult.seek(0)
-        if expected_output["type"] == "image":
-            ic("converting to image from bytes")
-            return StreamingResponse(ioresult, media_type="image/png")
+        return __convert_bytes_response(response, expected_output["type"])
 
     elif isinstance(response, io.IOBase):
-        ioresult = response
-        ioresult.seek(0)
-        if expected_output["type"] == "image":
-            ic("converting to image from io")
-            return StreamingResponse(ioresult, media_type="image/png")
+        return __convert_io_response(response, expected_output["type"])
 
     elif isinstance(response, list):
-        ic("converting to json from list")
-
         return json.dumps(response, cls=NpEncoder, ensure_ascii=False).encode('utf8')
 
     elif isinstance(response, str):
-        ic(f"converting string output")
-        try:
-            if pathlib.Path(response).is_file():
-                ic("streaming file", response)
-                file_to_stream = open(response, "rb")
-                out = StreamingResponse(file_to_stream, media_type=get_file_type(response))
-                os.remove(response)
-                ic(f"returning file {response}")
-                return out
-            else:
-                ic(f"returning string {response}")
-                return response
-        except OSError as oserr:
-            return response
-        
-    elif isinstance(response, bool):
-        ic(f"converting boolean")
+        return __convert_string_response(response)
+
+    elif isinstance(response, bool) or isinstance(response, float):
         return response
-    elif isinstance(response, float):
-        ic(f"converting float")
-        return response
-    else:
-        ic(f"converting whatever")
-        ioresult = response
-        ioresult.seek(0)
-        return StreamingResponse(ioresult, media_type="image/png")
+
+    warn(f"Response type not supported ({type(response)}), returning a stream")
+
+    ioresult = response
+    ioresult.seek(0)
+
+    return StreamingResponse(ioresult, media_type="image/png")

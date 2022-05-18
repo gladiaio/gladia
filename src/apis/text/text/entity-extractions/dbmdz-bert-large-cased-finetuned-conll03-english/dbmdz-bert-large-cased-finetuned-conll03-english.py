@@ -29,10 +29,8 @@ def predict(input_string: str) -> [dict]:
     LABELS = [NONE_LABEL, "B-MISC", "I-MISC", "B-PER", "I-PER", "B-ORG", "I-ORG", "B-LOC", "I-LOC"]
     MODEL_NAME = "ner_bert-large-cased-finetuned-conll03-english_base_traced"
     TOKENIZER_NAME = 'dbmdz/bert-large-cased-finetuned-conll03-english'
-    TRITON_SEVER_URL = os.getenv("TRITON_SERVER_URL", default='localhost:8000')
 
     client = TritonClient(
-        TRITON_SEVER_URL,
         MODEL_NAME,
         current_path=os.path.split(__file__)[0]
     )

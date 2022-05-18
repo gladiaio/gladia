@@ -12,16 +12,19 @@ class TritonClient():
     """Wrapper suggaring triton'client usage
     """
 
-    def __init__(self, triton_server_url: str, model_name: str, current_path: str = "") -> None:
+    def __init__(self, model_name: str, current_path: str = "") -> None:
         """TritonClient's initializer
 
         Args:
-            triton_server_url (str): URL to the triton server
             model_name (str): name of the model to communicate with
             current_path (str, optional): current path (allows to download model if needed). Defaults to "".
         """
-        self.__triton_server_url = triton_server_url
+
         self.__model_name = model_name
+        self.__triton_server_url = os.getenv("TRITON_SERVER_URL")
+
+        if not self.__triton_server_url:
+            raise RuntimeError("URL of the triton server not specified")
 
         self.__client = tritonclient.InferenceServerClient(url=self.__triton_server_url, verbose=False)
 

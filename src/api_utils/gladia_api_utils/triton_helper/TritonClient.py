@@ -4,6 +4,7 @@ import tritonclient.http as tritonclient
 
 from time import sleep
 from typing import Any
+from inspect import stack
 from warnings import warn
 from .download_active_models import download_triton_model
 
@@ -12,12 +13,12 @@ class TritonClient():
     """Wrapper suggaring triton'client usage
     """
 
-    def __init__(self, model_name: str, current_path: str = "") -> None:
+    def __init__(self, model_name: str, model_path: str = os.path.split(stack()[1].filename)[0]) -> None:
         """TritonClient's initializer
 
         Args:
             model_name (str): name of the model to communicate with
-            current_path (str, optional): current path (allows to download model if needed). Defaults to "".
+            model_path (str, optional): path to the folder where the model is called (allows to download model if needed). Defaults to "".
         """
 
         self.__model_name = model_name
@@ -40,7 +41,7 @@ class TritonClient():
         if os.getenv('TRITON_MODELS_PATH') == "":
             warn("[DEBUG] TRITON_MODELS_PATH is not set, please specify it in order to be able to download models.")
 
-        self.__download_model(os.path.join(current_path, ".git_path"))
+        self.__download_model(os.path.join(model_path, ".git_path"))
 
     @property
     def client(self):

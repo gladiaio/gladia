@@ -1,4 +1,3 @@
-import os
 import numpy as np
 
 from transformers import AutoTokenizer
@@ -32,7 +31,6 @@ def predict(input_string: str) -> [dict]:
 
     client = TritonClient(
         MODEL_NAME,
-        current_path=os.path.split(__file__)[0]
     )
 
     tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_NAME)

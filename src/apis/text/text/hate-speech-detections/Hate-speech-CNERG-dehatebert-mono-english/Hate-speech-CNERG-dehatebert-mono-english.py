@@ -1,13 +1,7 @@
-import os
-import requests
 import numpy as np
-# import tritonclient.http as tritonclient
 
-# from time import sleep
-from warnings import warn
 from transformers import BertTokenizer
 from gladia_api_utils.triton_helper import TritonClient
-# from gladia_api_utils.triton_helper import download_triton_model
 
 
 def predict(text: str) -> str:
@@ -24,7 +18,6 @@ def predict(text: str) -> str:
 
     client = TritonClient(
         MODEL_NAME,
-        current_path=os.path.split(__file__)[0]
     )
 
     tokenizer = BertTokenizer.from_pretrained(TOKENIZER_NAME)

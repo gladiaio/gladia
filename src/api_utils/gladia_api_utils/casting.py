@@ -24,7 +24,7 @@ class NpEncoder(json.JSONEncoder):
             return super(NpEncoder, self).default(obj)
 
 
-def __convert_PIL_Image_response(response: PIL.Image.Image, output_type: str):
+def __convert_PIL_Image_response(response: PIL.Image.Image):
     ioresult = io.BytesIO()
 
     response.save(ioresult, format="png")
@@ -109,7 +109,7 @@ def cast_response(response, expected_output: dict):
     """
 
     if isinstance(response, PIL.Image.Image):
-        return __convert_PIL_Image_response(response, expected_output["type"])
+        return __convert_PIL_Image_response(response)
 
     elif isinstance(response, np.ndarray):
         return __convert_ndarray_response(response, expected_output["type"])

@@ -1,6 +1,6 @@
 import os
 
-from gladia_api_utils.triton_helper import download_active_triton_models
+from gladia_api_utils.inference.triton_helper import download_active_triton_models
 
 
 def main():

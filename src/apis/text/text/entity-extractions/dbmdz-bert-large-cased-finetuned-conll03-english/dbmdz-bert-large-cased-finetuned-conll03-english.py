@@ -1,7 +1,7 @@
 import numpy as np
 
 from transformers import AutoTokenizer
-from gladia_api_utils.triton_helper import TritonClient
+from gladia_api_utils.inference import Inferer, Engine
 
 
 def softmax(x: [float]) -> [float]:
@@ -29,15 +29,16 @@ def predict(input_string: str) -> [dict]:
     MODEL_NAME = "ner_bert-large-cased-finetuned-conll03-english_base_traced"
     TOKENIZER_NAME = 'dbmdz/bert-large-cased-finetuned-conll03-english'
 
-    client = TritonClient(
-        MODEL_NAME,
+    client = Inferer(
+        engine=Engine.TRITON,
+        model_name=MODEL_NAME,
     )
 
     tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_NAME)
 
     input_ids = tokenizer(input_string, return_tensors="pt", max_length=256, padding="max_length").input_ids
 
-    client.register_new_input(shape=(1, 256), datatype='INT32')
+    client.engine.register_new_input(shape=(1, 256), datatype='INT32')
     outputs = client(input_ids.detach().numpy().astype(np.int32))[0]
 
     predictions = []

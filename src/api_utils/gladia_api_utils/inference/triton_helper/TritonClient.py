@@ -101,6 +101,7 @@ class TritonClient():
         Returns:
             [Any]: List of outputs from the model
         """
+
         del kwds
 
         for arg, registered_input in zip(args, self.__registered_inputs):

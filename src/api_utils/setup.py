@@ -24,7 +24,8 @@ setup(
     license="MIT",
     packages=[
         "gladia_api_utils",
-        "gladia_api_utils.triton_helper",
+        "gladia_api_utils.inference",
+        "gladia_api_utils.inference.triton_helper",
     ],
     install_requires=[
         "PyYAML",

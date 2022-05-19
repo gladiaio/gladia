@@ -8,7 +8,7 @@
 </p>
 
 ---
-**Open Source Project Website**: <a href="https://www.gladia.io/" target="_blank">https://www.gladia.io/</a>
+**Open Source Project Website**: <a href="https://gladia.io/" target="_blank">https://gladia.io/</a>
 
 **Documentation**: <a href="https://docs.gladia.io/" target="_blank">https://docs.gladia.io/</a>
 

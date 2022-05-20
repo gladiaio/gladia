@@ -1,0 +1,19 @@
+name: common
+
+dependencies:
+  - conda-forge::pandas=1.3.5
+  - conda-forge::gdown=4.4.0
+  - conda-forge::python-magic=0.4.25
+  - conda-forge::icecream=2.1.2
+  - conda-forge::googledrivedownloader=0.4
+  - conda-forge::mkl
+  - conda-forge::mkl-service
+  - conda-forge::pytorch=1.11.0 
+  - conda-forge::Pillow=9.0.1
+  - conda-forge::cudatoolkit
+  - conda-forge::cudnn
+  - pip
+  - pip:
+    - tensorflow_gpu==2.8.0
+    - xtract==0.1a3
+    - -e /app/api_utils/

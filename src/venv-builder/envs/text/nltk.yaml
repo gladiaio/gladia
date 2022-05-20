@@ -1,0 +1,4 @@
+name: text-nltk
+
+dependencies:
+  - conda-forge::nltk=3.7

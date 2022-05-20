@@ -1,0 +1,5 @@
+name: image-base
+
+dependencies:
+  - conda-forge::opencv-python=4.5.5.64
+  - conda-forge::pillow=9.0.1

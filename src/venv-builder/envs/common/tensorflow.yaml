@@ -1,0 +1,8 @@
+name: common-tensorflow
+
+dependencies:
+  - conda-forge::pip
+  - pip:
+    - tensorflow_gpu==2.8.0
+    - xtract==0.1a3
+    - -e /app/api_utils/

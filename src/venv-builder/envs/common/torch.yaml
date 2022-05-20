@@ -1,0 +1,4 @@
+name: common-torch
+
+dependencies:
+  - conda-forge::pytorch=1.11.0 

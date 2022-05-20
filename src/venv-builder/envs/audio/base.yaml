@@ -1,0 +1,4 @@
+name: audio-base
+
+dependencies:
+  - conda-forge::pip

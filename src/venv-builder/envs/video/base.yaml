@@ -1,0 +1,4 @@
+name: video-base
+
+dependencies:
+  - conda-forge::pip

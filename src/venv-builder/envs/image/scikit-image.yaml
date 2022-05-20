@@ -1,0 +1,4 @@
+name: image-scikit-image
+
+dependencies:
+  - conda-forge::scikit-image=0.19.2

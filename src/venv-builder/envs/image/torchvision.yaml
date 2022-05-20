@@ -1,0 +1,4 @@
+name: image-torchvision
+
+dependencies:
+  - conda-forge::torchvision=0.12.0

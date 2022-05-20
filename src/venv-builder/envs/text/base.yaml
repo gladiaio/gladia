@@ -1,0 +1,4 @@
+name: text-base
+
+dependencies:
+  - conda-forge::pip

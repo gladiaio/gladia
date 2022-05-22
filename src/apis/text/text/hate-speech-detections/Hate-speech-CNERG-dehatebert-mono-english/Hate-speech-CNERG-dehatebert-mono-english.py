@@ -29,7 +29,7 @@ def predict(text: str) -> str:
         current_path=os.path.split(__file__)[0]
     )
 
-    tokenizer = BertTokenizer.from_pretrained(TOKENIZER_NAME)
+    tokenizer = BertTokenizer.from_pretrained(TOKENIZER_NAME, use_fast=True)
 
     input_ids = tokenizer(text, return_tensors="pt", max_length=256, padding="max_length").input_ids
 

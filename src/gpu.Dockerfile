@@ -45,7 +45,6 @@ ENV PIPENV_VENV_IN_PROJECT="enabled" \
     NLTK_DATA="/tmp/gladia/nltk" \
     LC_ALL="C.UTF-8" \
     LANG="C.UTF-8" \
-    MINICONDA_INSTALL_PATH="/opt/conda" \
     distro="ubuntu2004" \
     arch="x86_64" \
     TRITON_MODELS_PATH="/tmp/gladia/triton" \
@@ -58,12 +57,6 @@ RUN apt-get install -y apt-transport-https && \
     apt-get clean && \
     apt-get update --allow-insecure-repositories -y
 
-# Install miniconda for python3.8 linux x86 64b
-RUN wget "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.11.0-Linux-x86_64.sh" && \
-    chmod +x Miniconda3-py38_4.11.0-Linux-x86_64.sh && \
-    ./Miniconda3-py38_4.11.0-Linux-x86_64.sh -b -p $MINICONDA_INSTALL_PATH && \
-    echo ". $MINICONDA_INSTALL_PATH/etc/profile.d/conda.sh" >> ~/.bashrc && \
-    echo "conda activate" >> ~/.bashrc
 
 # Install Cmake
 RUN apt install -y libssl-dev && \
@@ -89,6 +82,27 @@ RUN wget https://developer.download.nvidia.com/compute/cuda/repos/$distro/$arch/
 RUN dpkg -i cuda-keyring_1.0-1_all.deb
 
 RUN sed -i 's/deb https:\/\/developer.download.nvidia.com\/compute\/cuda\/repos\/ubuntu2004\/x86_64.*//g' /etc/apt/sources.list
+
+# env vars for micro-mamba
+ENV MAMBA_ROOT_PREFIX="/opt/conda"
+ENV MAMBA_EXE="/usr/local/bin/micromamba"
+ENV MAMBA_DOCKERFILE_ACTIVATE=1
+ENV MAMBA_ALWAYS_YES=true
+ENV PATH=$PATH:/usr/local/bin/:$MAMBA_EXE
+
+# Install micromamba
+RUN wget -qO- "https://micro.mamba.pm/api/micromamba/linux-64/latest" | tar -xvj bin/micromamba
+RUN mv bin/micromamba /usr/local/bin/micromamba
+RUN micromamba shell init -s bash
+
+# Script which launches commands passed to "docker run"
+COPY _entrypoint.sh /usr/local/bin/_entrypoint.sh
+COPY _activate_current_env.sh /usr/local/bin/_activate_current_env.sh
+ENTRYPOINT ["/usr/local/bin/_entrypoint.sh"]
+
+# Automatically activate micromaba for every bash shell
+RUN echo "source /usr/local/bin/_activate_current_env.sh" >> ~/.bashrc && \
+    echo "source /usr/local/bin/_activate_current_env.sh" >> /etc/skel/.bashrc
 
 # Add python repository and install python3.7
 RUN add-apt-repository -y ppa:deadsnakes/ppa && \
@@ -117,23 +131,15 @@ RUN apt-get install -y \
         python3-pil \
         tesseract-ocr-all
 
-SHELL ["/opt/conda/bin/conda", "run", "-n", "base", "/bin/bash", "-c"]
+# SHELL ["/opt/conda/bin/conda", "run", "-n", "base", "/bin/bash", "-c"]
 
 WORKDIR /app
 
-# Install python packages
-RUN for package in $(cat /app/requirements.txt); do echo "================="; echo "installing ${package}"; echo "================="; pip3 install $package; done && \
-    pip3 install -e ./api_utils/ && \
-    pip3 uninstall -y botocore transformers && \
-    pip3 install botocore transformers && \
-    pip3 install pipenv && \
-    pip3 install nltk && \
-    pip3 install api_utils/ && \
-    sh /app/clean-layer.sh && \
-    rm /app/clean-layer.sh
+RUN micromamba create -f env.yaml
+RUN micromamba run -n server /bin/bash -c "cd venv-builder/ && python3 create_default_envs.py"
+RUN micromamba run -n server /bin/bash -c "cd venv-builder/ && python3 create_custom_envs.py"
+SHELL ["/usr/local/bin/micromamba", "run", "-n", "server", "/bin/bash", "-c"]
 
-# Build custom envs
-RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then cd /app/venv-builder && python setup_custom_envs.py -x -r /app/apis/ && python setup_custom_envs.py $SETUP_CUSTOM_ENV_BUILD_MODE; fi
 
 # Clean caches
 RUN if [ "$SKIP_ROOT_CACHE_CLEANING" = "false" ]; then [ -d "/root/.cache/" ] && rm -rf "/root/.cache/*"; fi && \
@@ -144,8 +150,6 @@ RUN if [ "$SKIP_ROOT_CACHE_CLEANING" = "false" ]; then [ -d "/root/.cache/" ] &&
     apt-get clean && \
     apt-get autoremove --purge
 
-ENV PATH=$MINICONDA_INSTALL_PATH/bin:$PATH
-
 RUN mv /usr/bin/python3 /usr/bin/python38 && \
     ln -sf /usr/bin/python /usr/bin/python3
 
@@ -153,6 +157,4 @@ RUN mv /app/entrypoint.sh /opt/nvidia/nvidia_entrypoint.sh
 
 EXPOSE 80
 
-ENTRYPOINT ["/bin/bash"]
-
-CMD ["/app/run_server_prod.sh"]
+CMD ["micromamba", "run", "-n", "server", "/app/run_server_prod.sh"]

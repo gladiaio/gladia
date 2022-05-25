@@ -263,30 +263,6 @@ class TaskRouter:
                 model = quote(model)
                 output_tmp_result = quote(output_tmp_result)
 
-                # check https://www.dev2qa.com/how-to-import-a-python-module-from-a-python-file-full-path/
-                # for a better solution
-
-                cmd = f"""LD_LIBRARY_PATH=/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/opt/conda/lib; cd /app/{module_path} && \
-pipenv run python3 -c "
-import os
-os.environ['LD_LIBRARY_PATH'] = '/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/opt/conda/lib'
-from PIL import Image
-import importlib.util
-spec = importlib.util.spec_from_file_location('/app/{module_path}', '/app/{module_path}/{model}.py')
-this_module = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(this_module)
-output = this_module.predict(**{kwargs_str})
-
-#FIXME
-## convert output to bytes
-## move this to string comparison
-if isinstance(output, Image.Image):
-    output.save('{output_tmp_result}', format='PNG')
-else:
-    with open('{output_tmp_result}', 'w') as f:
-        f.write(str(output))
-" """
-                # TODO: load l'env micromamba
                 cmd = f"""
 python -c "
 
@@ -324,20 +300,6 @@ else:
                         detail=f"The following error occurred: {str(e)}"
                     )
 
-                # C'est ici qu'il spawn le process avec le venv
-                # proc = await asyncio.create_subprocess_shell(
-                #     cmd=cmd,
-                #     stdout=asyncio.subprocess.PIPE,
-                #     stderr=asyncio.subprocess.PIPE,
-                #     start_new_session=True
-                # )
-
-                # stdout, stderr = await proc.communicate()
-
-                # print()
-                # print(stderr)
-                # print()
-                
                 if is_binary_file(output_tmp_result):
                     file = open(output_tmp_result, "rb")
                     result = file.read()

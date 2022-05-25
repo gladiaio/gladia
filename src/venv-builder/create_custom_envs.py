@@ -6,13 +6,14 @@ from gladia_api_utils import get_activated_task_path
 
 
 def create_custom_env(env_name: str, path_to_env_file: str) -> None:
+    custom_env = yaml.safe_load(open(path_to_env_file, "r"))
+
     try:
-        subprocess.run(f"micromamba create -n {env_name}".split(" "), check=True)
+        # TODO: adding a python version should be optional
+        subprocess.run(f"micromamba create -n {env_name} -c conda-forge python={custom_env['python']}".split(" "), check=True)
 
     except subprocess.CalledProcessError as error:
         raise RuntimeError(f"Couldn't create env {env_name}: {error}")
-
-    custom_env = yaml.safe_load(open(path_to_env_file, "r"))
 
     try:
         subprocess.run(f"micromamba run -n {env_name} pip install {' '.join(custom_env['packages'])}".split(" "), check=True)

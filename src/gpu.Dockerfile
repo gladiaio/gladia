@@ -131,8 +131,6 @@ RUN apt-get install -y \
         python3-pil \
         tesseract-ocr-all
 
-# SHELL ["/opt/conda/bin/conda", "run", "-n", "base", "/bin/bash", "-c"]
-
 WORKDIR /app
 
 RUN micromamba create -f env.yaml

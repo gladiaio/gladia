@@ -1,6 +1,8 @@
 import os
 import re
 import sys
+import json
+import yaml
 import forge
 import asyncio
 import pathlib
@@ -9,7 +11,7 @@ import tempfile
 import warnings
 import starlette
 import importlib
-import json
+import subprocess
 
 from shlex import quote
 from pathlib import Path
@@ -109,6 +111,34 @@ def versions_list(root_path=None) -> list:
                 versions.append(fname)
 
     return versions, package_path
+
+
+def exec_in_custom_env(path_to_env_file: str, cmd: str):
+    path = path_to_env_file.split("/")
+
+    task = path[-3]
+    model = path[-2]
+
+    env_name = f"{task}-{model}"
+
+    env_cfg = yaml.safe_load(open(path_to_env_file))
+
+    env_to_inherite_from = ''
+    if "inheritance" in env_cfg.keys() and len(env_cfg['inheritance']) > 0:
+        env_to_inherite_from = "micromamba activate " + "&& micromamba activate --stack ".join(env_cfg["inheritance"])
+
+        cmd = f"{env_to_inherite_from} && micromamba activate --stack {env_name} && {cmd}"
+
+    else:
+        cmd = f"micromamba activate {env_name} && {cmd}"
+
+    print(f"cmd: [{cmd}]")
+
+    try:
+        os.system("""eval "$(micromamba shell hook --shell=bash)" && """ + cmd)
+
+    except subprocess.CalledProcessError as error:
+        raise RuntimeError(f"Couldn't activate custom env {env_name}: {error}")
 
 
 class TaskRouter:
@@ -256,18 +286,57 @@ else:
     with open('{output_tmp_result}', 'w') as f:
         f.write(str(output))
 " """
-                
-                proc = await asyncio.create_subprocess_shell(
-                    cmd,
-                    stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE,
-                    start_new_session=True)
+                # TODO: load l'env micromamba
+                cmd = f"""
+python -c "
 
-                stdout, stderr = await proc.communicate()
+import os
+import importlib.util
 
-                print()
-                print(stderr)
-                print()
+from PIL import Image
+
+os.environ['LD_LIBRARY_PATH'] = '/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/opt/conda/lib'
+
+spec = importlib.util.spec_from_file_location('/app/{module_path}', '/app/{module_path}/{model}.py')
+this_module = importlib.util.module_from_spec(spec)
+
+spec.loader.exec_module(this_module)
+
+output = this_module.predict(**{kwargs_str})
+
+if isinstance(output, Image.Image):
+    output.save('{output_tmp_result}', format='PNG')
+else:
+    with open('{output_tmp_result}', 'w') as f:
+        f.write(str(output))
+"
+"""
+
+                try:
+                    exec_in_custom_env(
+                        path_to_env_file=os.path.join(f'/app/{module_path}', 'env.yaml'),
+                        cmd=cmd
+                    )
+
+                except Exception as e:
+                    raise HTTPException(
+                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        detail=f"The following error occurred: {str(e)}"
+                    )
+
+                # C'est ici qu'il spawn le process avec le venv
+                # proc = await asyncio.create_subprocess_shell(
+                #     cmd=cmd,
+                #     stdout=asyncio.subprocess.PIPE,
+                #     stderr=asyncio.subprocess.PIPE,
+                #     start_new_session=True
+                # )
+
+                # stdout, stderr = await proc.communicate()
+
+                # print()
+                # print(stderr)
+                # print()
                 
                 if is_binary_file(output_tmp_result):
                     file = open(output_tmp_result, "rb")
@@ -289,6 +358,7 @@ else:
                     model, f"{self.root_package_path}/{model}/{model}.py"
                 ).load_module()
 
+                # C'est ici qu'il lance le process sans venv
                 result = getattr(this_module, f"predict")(*args, **kwargs)
             try:
                 return cast_response(result, self.output)

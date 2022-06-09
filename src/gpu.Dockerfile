@@ -157,7 +157,7 @@ RUN mv /app/entrypoint.sh /opt/nvidia/nvidia_entrypoint.sh
 
 EXPOSE $API_SERVER_PORT_HTTP
 
-RUN chown $DOCKER_USER:$DOCKER_GROUP 
+RUN chown -R $DOCKER_USER:$DOCKER_GROUP 
 
 ENTRYPOINT ["/bin/bash"]
 

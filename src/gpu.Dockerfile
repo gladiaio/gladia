@@ -35,23 +35,37 @@ ARG SKIP_YARN_CACHE_CLEANING="false"
 ARG SKIP_NPM_CACHE_CLEANING="false"
 ARG SKIP_TMPFILES_CACHE_CLEANING="false"
 ARG SKIP_NTLK_DL="false"
-ARG GLADIA_API_UTILS_BRANCH="main"
 
 ENV PIPENV_VENV_IN_PROJECT="enabled" \
+    GLADIA_TMP_PATH="/tmp/gladia/" \
+    MODEL_CACHE_ROOT=$GLADIA_TMP_PATH"/models" \
+    TRANSFORMERS_CACHE=$MODEL_CACHE_ROOT"/transformers" \
+    PYTORCH_TRANSFORMERS_CACHE=$MODEL_CACHE_ROOT"/pytorch_transformers" \
+    PYTORCH_PRETRAINED_BERT_CACHE=$MODEL_CACHE_ROOT"/pytorch_pretrained_bert" \
+    NLTK_DATA=$GLADIA_TMP_PATH"/nltk" \
     TOKENIZERS_PARALLELISM="true" \
-    TRANSFORMERS_CACHE="/tmp/gladia/models/transformers" \
-    PYTORCH_TRANSFORMERS_CACHE="/tmp/gladia/models/pytorch_transformers" \
-    PYTORCH_PRETRAINED_BERT_CACHE="/tmp/gladia/models/pytorch_pretrained_bert" \
-    NLTK_DATA="/tmp/gladia/nltk" \
     LC_ALL="C.UTF-8" \
     LANG="C.UTF-8" \
     MINICONDA_INSTALL_PATH="/opt/conda" \
     distro="ubuntu2004" \
     arch="x86_64" \
-    TRITON_MODELS_PATH="/tmp/gladia/triton" \
+    TRITON_MODELS_PATH=GLADIA_TMP_PATH"/triton" \
     TRITON_SERVER_PORT_HTTP=8000 \
     TRITON_SERVER_PORT_GRPC=8001 \
-    TRITON_SERVER_PORT_METRICS=8002
+    TRITON_SERVER_PORT_METRICS=8002 \
+    PATH_TO_GLADIA_SRC="/app" \
+    API_SERVER_PORT_HTTP=8080 \
+    API_SERVER_WORKERS=1
+
+RUN mkdir -p $TRITON_MODELS_PATH && \
+    mkdir -p $GLADIA_TMP_PATH && \
+    mkdir -p $MODEL_CACHE_ROOT && \
+    mkdir -p $TRANSFORMERS_CACHE && \
+    mkdir -p $PYTORCH_TRANSFORMERS_CACHE && \
+    mkdir -p $PYTORCH_PRETRAINED_BERT_CACHE && \
+    mkdir -p $NLTK_DATA && \
+    mkdir -p $TRITON_MODELS_PATH \
+    mkdir -p $PATH_TO_GLADIA_SRC
 
 # Update apt repositories
 RUN apt-get install -y apt-transport-https && \
@@ -73,7 +87,7 @@ RUN apt install -y libssl-dev && \
     make && \
     make install
 
-COPY . /app
+COPY . $PATH_TO_GLADIA_SRC
 
 WORKDIR /tmp
 
@@ -151,7 +165,17 @@ RUN mv /usr/bin/python3 /usr/bin/python38 && \
 
 RUN mv /app/entrypoint.sh /opt/nvidia/nvidia_entrypoint.sh
 
-EXPOSE 80
+ARG DOCKER_USER=root
+ARG DOCKER_GROUP=root
+
+# API_SERVER_PORT_HTTP is set as a build arg
+# in order to manage the EXPOSE port param
+ARG API_SERVER_PORT_HTTP=8080
+
+RUN chown -R $DOCKER_USER:$DOCKER_GROUP $PATH_TO_GLADIA_SRC && \
+    chown -R $DOCKER_USER:$DOCKER_GROUP $GLADIA_TMP_PATH
+
+EXPOSE $API_SERVER_PORT_HTTP
 
 ENTRYPOINT ["/bin/bash"]
 

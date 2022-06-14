@@ -60,7 +60,7 @@ Follow Gladia Twitter account to get the latest update
 # Quickstart
 ## Magic Start
 ```sh
-docker run -d -p 8080:80 gladiaio/gladia:latest
+docker run -d -p 8080:8080 gladiaio/gladia:latest
 ```
 Access the service through [http://localhost:8080/docs](http://localhost:8080/docs) or [http://localhost:8080/redoc](http://localhost:8080/redoc) or whatever public/private IP of the server you are running on
 
@@ -96,7 +96,7 @@ python test.py http://localhost:80
 
 ## Running the production environement
 ```
-docker run -d -p 8080:80 gladiaio/gladia:latest
+docker run -d -p 8080:8080 gladiaio/gladia:latest
 ```
 
 # CI

@@ -204,7 +204,7 @@ class TaskRouter:
             if os.path.isfile(os.path.join(module_path, 'env.yaml')):
                 if not os.path.isdir(os.path.join(module_path, '.venv')):
                     # FIXME: this is not working
-                    os.system("python3 /app/venv-builder/setup_custom_envs.py -l -p 1 -r " + module_path)
+                    os.system(f"python3 {os.getenv('PATH_TO_GLADIA_SRC')}/venv-builder/setup_custom_envs.py -l -p 1 -r " + module_path)
 
                 routeur = singularize(self.root_package_path)
 
@@ -236,7 +236,7 @@ class TaskRouter:
                 # check https://www.dev2qa.com/how-to-import-a-python-module-from-a-python-file-full-path/
                 # for a better solution
 
-                cmd = f"""LD_LIBRARY_PATH=/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/opt/conda/lib; cd /app/{module_path} && \
+                cmd = f"""LD_LIBRARY_PATH=/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/opt/conda/lib; cd {os.getenv("PATH_TO_GLADIA_SRC")}/{module_path} && \
 pipenv run python3 -c "
 import os
 os.environ['LD_LIBRARY_PATH'] = '/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/opt/conda/lib'

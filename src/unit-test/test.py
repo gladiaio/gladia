@@ -124,7 +124,7 @@ def perform_test(details, url, header, path, skip_when_failed, max_retry=3):
 
 
 @click.command()
-@click.option('-u', '--url', type=str, default=f"http://localhost:{os.getenv('API_SERVER_PORT_HTTP', default='8080')}")
+@click.option('-u', '--url', type=str, default=f"http://localhost:{os.getenv('API_SERVER_PORT_HTTP', default='8080')}", help="URL to test")
 @click.option('-b', '--bearer_token', type=str, default='', help="Bearer token for the secured url (if applicable)")
 @click.option('-s', '--specific_endpoints', type=str, default='', help="CSV separated list of specific endpoints/routes to test format is /input/output/singular_format_task/")
 @click.option('-c', '--continue_when_failed', type=bool, is_flag=True, default=False, help="Continue all other tests even when 1 test failed")

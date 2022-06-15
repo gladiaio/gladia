@@ -1,13 +1,10 @@
 name: common-base
 
 dependencies:
-  - conda-forge::gdown=4.4.0
-  - conda-forge::python-magic=0.4.25
-  - conda-forge::icecream=2.1.2
-  - conda-forge::googledrivedownloader=0.4
-  - conda-forge::mkl
-  - conda-forge::mkl-service
+  - conda-forge::cudatoolkit
+  - conda-forge::cudnn
+  - conda-forge::tritonclient==2.21.0
+  - conda-forge::tritonclient[http]
   - pip
   - pip:
-    - xtract==0.1a3
     - -e /app/api_utils/

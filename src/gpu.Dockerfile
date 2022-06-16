@@ -60,6 +60,7 @@ RUN apt-get install -y apt-transport-https && \
 
 # Install Cmake
 RUN apt install -y libssl-dev && \
+    apt install -y libpng-dev libjpeg-dev && \
     wget https://github.com/Kitware/CMake/releases/download/v3.20.0/cmake-3.20.0.tar.gz && \
     tar -zxvf cmake-3.20.0.tar.gz > /dev/null && \
     cd cmake-3.20.0 && ./bootstrap > /dev/null && \
@@ -134,8 +135,8 @@ RUN apt-get install -y \
 WORKDIR /app
 
 RUN micromamba create -f env.yaml
-RUN micromamba run -n server /bin/bash -c "cd venv-builder/ && python3 create_default_envs.py"
-RUN micromamba run -n server /bin/bash -c "cd venv-builder/ && python3 create_custom_envs.py"
+# RUN micromamba run -n server /bin/bash -c "cd venv-builder/ && python3 create_default_envs.py"
+# RUN micromamba run -n server /bin/bash -c "cd venv-builder/ && python3 create_custom_envs.py"
 SHELL ["/usr/local/bin/micromamba", "run", "-n", "server", "/bin/bash", "-c"]
 
 

@@ -3,6 +3,7 @@ import yaml
 import tempfile
 import subprocess
 
+from tqdm import tqdm
 from typing import Tuple, List
 from gladia_api_utils import get_activated_task_path
 
@@ -27,6 +28,8 @@ def create_temp_env_file(
     packages_to_install_from_pip: List[str]
 ) -> str:
 
+    print("Installing env name:", env_name, "\n", " - /" * 100)
+
     tmp = tempfile.NamedTemporaryFile(delete=False)
 
     content = """
@@ -38,12 +41,7 @@ dependencies:""" + ''.join([f"\n  - {package}" for package in packages_to_instal
     with open(tmp.name, "w") as f:
         f.write(content)
 
-    # tmp.write(content.encode("utf-8"))
     tmp.close()
-
-    print(content)
-    print(tmp.name)
-    # exit()
 
     return tmp
 
@@ -52,6 +50,9 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
     custom_env = yaml.safe_load(open(path_to_env_file, "r"))
 
     packages_to_install_from_pip, packages_to_install_from_channel = retrieve_package_from_env_file(custom_env)
+
+    if "inherit" not in custom_env.keys():
+        custom_env["inherit"] = []
 
     for env_to_inherit in custom_env["inherit"]:
 
@@ -74,8 +75,6 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
         packages_to_install_from_pip
     )
 
-    print("name of the env file: ", temporary_file.name, "##############################################")
-
     os.link(temporary_file.name, temporary_file.name + ".yaml")
 
     try:
@@ -91,8 +90,7 @@ def main():
         path_to_apis="../apis"
     )
 
-
-    for task in paths:
+    for task in tqdm(paths):
         models = list(filter(lambda dir : os.path.split(dir)[-1][0] not in ['_', '.'], os.listdir(task)))
 
         for model in models:

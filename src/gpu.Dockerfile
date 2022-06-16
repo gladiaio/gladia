@@ -68,6 +68,14 @@ RUN mkdir -p $TRITON_MODELS_PATH && \
     mkdir -p $PATH_TO_GLADIA_SRC
 
 # Update apt repositories
+# Add Nvidia GPG key
+RUN apt-key del 7fa2af80
+RUN wget https://developer.download.nvidia.com/compute/cuda/repos/$distro/$arch/cuda-keyring_1.0-1_all.deb
+
+RUN dpkg -i cuda-keyring_1.0-1_all.deb
+
+RUN sed -i 's/deb https:\/\/developer.download.nvidia.com\/compute\/cuda\/repos\/ubuntu2004\/x86_64.*//g' /etc/apt/sources.list
+
 RUN apt-get install -y apt-transport-https && \
     apt-get clean && \
     apt-get update --allow-insecure-repositories -y

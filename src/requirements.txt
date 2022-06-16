@@ -1,3 +1,4 @@
+/app/api_utils/  --install-option='-e' # TODO: replace /app/ by varenv
 scikit-build==0.14.1
 icecream==2.1.1
 uvicorn==0.14.0
@@ -12,7 +13,6 @@ easyargs==0.9.4
 exitstatus==2.1.0
 botocore==1.22.6
 google-cloud-bigquery-storage==2.13.1
-nltk==3.6.*
 tensorflow==2.8.*
 torch==1.9.1
 torchaudio==0.9.1

@@ -3,8 +3,10 @@ name: common-base
 dependencies:
   - conda-forge::cudatoolkit
   - conda-forge::cudnn
-  - conda-forge::tritonclient==2.21.0
-  - conda-forge::tritonclient[http]
   - pip
+  - setuptools
+  - wheel
   - pip:
     - -e /app/api_utils/
+    - tritonclient[http]
+    - tritonclient==2.21.0

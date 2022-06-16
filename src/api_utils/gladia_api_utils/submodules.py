@@ -19,11 +19,15 @@ from pydantic import create_model
 from .casting import cast_response
 from .file_management import write_tmp_file
 from fastapi import APIRouter, File, Query, UploadFile, HTTPException, status
+from fastapi.responses import JSONResponse
+from .responses import ImageResponse, AudioResponse, VideoResponse
+
 
 versions = list()
 available_versions = list()
 
 PATTERN = re.compile(r'((\w:)|(\.))((/(?!/)(?!/)|\\{2})[^\n?"|></\\:*]+)+')
+
 
 def is_binary_file(file_path: str) -> bool:
     textchars = bytearray({7,8,9,10,12,13,27} | set(range(0x20, 0x100)) - {0x7f})
@@ -206,11 +210,32 @@ class TaskRouter:
         async def get_versions():
             return self.versions
 
+        response_classes = {
+            "image": ImageResponse,
+            "video": VideoResponse,
+            "audio": AudioResponse,
+        }
+
+        response_class = response_classes.get(self.output["type"], JSONResponse)
+
+        responses = {}
+        if response_class in response_classes.values():
+            responses = {
+                200: {
+                    "content": {
+                        response_class.media_type: {
+                            "schema": response_class.schema
+                        }
+                    }
+                }
+            }
+
         @router.post(
             "/",
             summary=f"Apply model for the {self.task} task for a given models",
             tags=[self.tags],
-            #            response_model=self.output
+            response_class=response_class,
+            responses=responses
         )
         @forge.sign(*input_list)
         async def apply(*args, **kwargs):
@@ -233,9 +258,6 @@ class TaskRouter:
 
             # if a virtualenv
             if os.path.isfile(os.path.join(module_path, 'env.yaml')):
-                # if not os.path.isdir(os.path.join(module_path, '.venv')):
-                #     # FIXME: this is not working
-                #     os.system("python3 /app/venv-builder/setup_custom_envs.py -l -p 1 -r " + module_path)
 
                 routeur = singularize(self.root_package_path)
 

@@ -46,7 +46,7 @@ os.environ["PIPENV_VENV_DEFAULT_VIDEO_PACKAGES_TXT"] = os.getenv('PIPENV_VENV_DE
 
 
 @click.command()
-@click.option('-r', '--rootdir', type=str, default='/app/apis/', help="Build env recursively from the provided directory path")
+@click.option('-r', '--rootdir', type=str, default=f'{os.getenv("PATH_TO_GLADIA_SRC")}/apis/', help="Build env recursively from the provided directory path")
 @click.option('-p', '--poolsize', type=int, default=0, help="Parallelness if set to 0 will use all threads")
 @click.option('-s', '--simlink', is_flag=True, type=bool, default=False, help="Will simlink gladia-api-utils from the local version of gladia-api-utils")
 @click.option('-c', '--compact_mode', is_flag=True, type=bool, default=False, help="Enable compact mode simlinking the default packages")

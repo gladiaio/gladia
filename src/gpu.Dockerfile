@@ -101,6 +101,9 @@ COPY _entrypoint.sh /usr/local/bin/_entrypoint.sh
 COPY _activate_current_env.sh /usr/local/bin/_activate_current_env.sh
 ENTRYPOINT ["/usr/local/bin/_entrypoint.sh"]
 
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX"/envs/server/lib/"
+ENV PATH_TO_GLADIA_SRC="/app"
+
 # Automatically activate micromaba for every bash shell
 RUN echo "source /usr/local/bin/_activate_current_env.sh" >> ~/.bashrc && \
     echo "source /usr/local/bin/_activate_current_env.sh" >> /etc/skel/.bashrc
@@ -136,7 +139,7 @@ WORKDIR /app
 
 RUN micromamba create -f env.yaml
 # RUN micromamba run -n server /bin/bash -c "cd venv-builder/ && python3 create_default_envs.py"
-# RUN micromamba run -n server /bin/bash -c "cd venv-builder/ && python3 create_custom_envs.py"
+RUN micromamba run -n server /bin/bash -c "cd venv-builder/ && python3 create_custom_envs.py"
 SHELL ["/usr/local/bin/micromamba", "run", "-n", "server", "/bin/bash", "-c"]
 
 

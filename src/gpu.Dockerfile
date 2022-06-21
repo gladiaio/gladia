@@ -35,10 +35,11 @@ ARG SKIP_YARN_CACHE_CLEANING="false"
 ARG SKIP_NPM_CACHE_CLEANING="false"
 ARG SKIP_TMPFILES_CACHE_CLEANING="false"
 ARG SKIP_NTLK_DL="false"
+ARG GLADIA_TMP_PATH="/tmp/gladia/"
+ARG MODEL_CACHE_ROOT="$GLADIA_TMP_PATH/models"
 
-ENV PIPENV_VENV_IN_PROJECT="enabled" \
-    GLADIA_TMP_PATH="/tmp/gladia/" \
-    MODEL_CACHE_ROOT=$GLADIA_TMP_PATH"/models" \
+ENV TRANSFORMERS_CACHE=$MODEL_CACHE_ROOT"/transformers" \
+    PIPENV_VENV_IN_PROJECT="enabled" \
     TRANSFORMERS_CACHE=$MODEL_CACHE_ROOT"/transformers" \
     PYTORCH_TRANSFORMERS_CACHE=$MODEL_CACHE_ROOT"/pytorch_transformers" \
     PYTORCH_PRETRAINED_BERT_CACHE=$MODEL_CACHE_ROOT"/pytorch_pretrained_bert" \
@@ -48,13 +49,15 @@ ENV PIPENV_VENV_IN_PROJECT="enabled" \
     LANG="C.UTF-8" \
     distro="ubuntu2004" \
     arch="x86_64" \
-    TRITON_MODELS_PATH=GLADIA_TMP_PATH"/triton" \
+    TRITON_MODELS_PATH=$GLADIA_TMP_PATH"/triton" \
     TRITON_SERVER_PORT_HTTP=8000 \
     TRITON_SERVER_PORT_GRPC=8001 \
     TRITON_SERVER_PORT_METRICS=8002 \
     PATH_TO_GLADIA_SRC="/app" \
     API_SERVER_PORT_HTTP=8080 \
-    API_SERVER_WORKERS=1
+    API_SERVER_WORKERS=1 \
+    TORCH_HOME=$MODEL_CACHE_ROOT"/torch" \
+    TORCH_HUB=$MODEL_CACHE_ROOT"/torch/hub"
 
 RUN mkdir -p $TRITON_MODELS_PATH && \
     mkdir -p $GLADIA_TMP_PATH && \
@@ -113,10 +116,7 @@ RUN micromamba shell init -s bash
 # Script which launches commands passed to "docker run"
 COPY _entrypoint.sh /usr/local/bin/_entrypoint.sh
 COPY _activate_current_env.sh /usr/local/bin/_activate_current_env.sh
-ENTRYPOINT ["/usr/local/bin/_entrypoint.sh"]
-
-ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$MAMBA_ROOT_PREFIX"/envs/server/lib/"
-ENV PATH_TO_GLADIA_SRC="/app"
+# ENTRYPOINT ["/usr/local/bin/_entrypoint.sh"]
 
 # Automatically activate micromaba for every bash shell
 RUN echo "source /usr/local/bin/_activate_current_env.sh" >> ~/.bashrc && \
@@ -156,6 +156,9 @@ RUN micromamba create -f env.yaml
 RUN micromamba run -n server /bin/bash -c "cd venv-builder/ && python3 create_custom_envs.py"
 SHELL ["/usr/local/bin/micromamba", "run", "-n", "server", "/bin/bash", "-c"]
 
+ENV LD_PRELOAD="/opt/tritonserver/backends/pytorch/libmkl_rt.so"
+ENV LD_LIBRARY_PATH="/opt/conda/envs/server/lib/":$MAMBA_ROOT_PREFIX"/envs/server/lib/"
+ENV PATH_TO_GLADIA_SRC="/app"
 
 # Clean caches
 RUN if [ "$SKIP_ROOT_CACHE_CLEANING" = "false" ]; then [ -d "/root/.cache/" ] && rm -rf "/root/.cache/*"; fi && \
@@ -183,4 +186,11 @@ RUN chown -R $DOCKER_USER:$DOCKER_GROUP $PATH_TO_GLADIA_SRC && \
 
 EXPOSE $API_SERVER_PORT_HTTP
 
-CMD ["micromamba", "run", "-n", "server", "/app/run_server_prod.sh"]
+
+RUN apt-get install locate
+RUN updatedb
+
+ENTRYPOINT ["micromamba", "run", "-n", "server"]
+
+# CMD ["micromamba", "run", "-n", "server", "/app/run_server_prod.sh"]
+CMD ["/app/run_server_prod.sh"]

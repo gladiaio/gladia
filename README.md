@@ -78,19 +78,19 @@ docker build -t gladia -f gpu.Dockerfile .
 ## Running the dev environement
 This will create a 'model' volume that will store, once and for all, the AI models
 ```sh
-docker-compose up -d
+docker-compose -f docker-compose.dev.yaml up -d
 ```
 
 You can stop the services without removing the 'model' volume
 ```sh
-docker-compose down
+docker-compose -f docker-compose.dev.yaml down
 ```
 
 You can log in one the instances and run the tests 
 ```sh
 docker-compose exec gladia /bin/bash
 cd unit-test
-python test.py http://localhost:80
+python test.py
 ```
 
 

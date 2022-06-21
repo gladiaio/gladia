@@ -18,7 +18,7 @@ echo
 # This script can either be a wrapper around arbitrary command lines,
 # or it will simply exec bash if no arguments were given
 if [[ $# -eq 0 ]]; then
-  exec "/bin/bash"
+  /usr/local/bin/micromamba run -n server /bin/bash
 else
-  exec "/opt/conda/bin/conda run -n base /bin/bash -c $@"
+  /usr/local/bin/micromamba run -n server /bin/bash -c $@
 fi

@@ -120,7 +120,8 @@ COPY _activate_current_env.sh /usr/local/bin/_activate_current_env.sh
 
 # Automatically activate micromaba for every bash shell
 RUN echo "source /usr/local/bin/_activate_current_env.sh" >> ~/.bashrc && \
-    echo "source /usr/local/bin/_activate_current_env.sh" >> /etc/skel/.bashrc
+    echo "source /usr/local/bin/_activate_current_env.sh" >> /etc/skel/.bashrc && \
+    echo "micromamba activate server" >> ~/.bashrc
 
 # Add python repository and install python3.7
 RUN add-apt-repository -y ppa:deadsnakes/ppa && \

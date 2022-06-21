@@ -1,9 +1,9 @@
-python warm_up.py
+micromamba run -n server python warm_up.py
 
 API_SERVER_PORT_HTTP="${API_SERVER_PORT_HTTP:-8080}"
 API_SERVER_WORKERS="${API_SERVER_WORKERS:-1}"
 
-tritonserver \
+micromamba run -n server tritonserver \
   --http-port ${TRITON_SERVER_PORT_HTTP} \
   --grpc-port ${TRITON_SERVER_PORT_GRPC} \
   --metrics-port ${TRITON_SERVER_PORT_METRICS} \

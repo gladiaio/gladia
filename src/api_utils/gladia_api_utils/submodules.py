@@ -12,6 +12,7 @@ import warnings
 import starlette
 import importlib
 import subprocess
+import asyncio
 
 from shlex import quote
 from pathlib import Path
@@ -135,12 +136,13 @@ def exec_in_custom_env(path_to_env_file: str, cmd: str):
 
     # else:
     #     cmd = f"micromamba activate {env_name} && {cmd}"
+
     cmd = f"micromamba activate {env_name} && {cmd}"
 
-    print(f"cmd: [{cmd}]")
-
     try:
-        os.system("""eval "$(micromamba shell hook --shell=bash)" && """ + cmd)
+        full_cmd = f"""eval "$(micromamba shell hook --shell=bash)" && {cmd}"""
+
+        os.system(full_cmd)
 
     except subprocess.CalledProcessError as error:
         raise RuntimeError(f"Couldn't activate custom env {env_name}: {error}")
@@ -286,6 +288,8 @@ class TaskRouter:
                 model = quote(model)
                 output_tmp_result = quote(output_tmp_result)
 
+                PATH_TO_GLADIA_SRC = os.getenv("PATH_TO_GLADIA_SRC", "/app")
+
                 cmd = f"""
 python -c "
 
@@ -296,7 +300,7 @@ from PIL import Image
 
 os.environ['LD_LIBRARY_PATH'] = '/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/opt/conda/lib'
 
-spec = importlib.util.spec_from_file_location('/app/{module_path}', '/app/{module_path}/{model}.py')
+spec = importlib.util.spec_from_file_location('{PATH_TO_GLADIA_SRC}/{module_path}', '{PATH_TO_GLADIA_SRC}/{module_path}/{model}.py')
 this_module = importlib.util.module_from_spec(spec)
 
 spec.loader.exec_module(this_module)
@@ -313,7 +317,7 @@ else:
 
                 try:
                     exec_in_custom_env(
-                        path_to_env_file=os.path.join(f'/app/{module_path}', 'env.yaml'),
+                        path_to_env_file=os.path.join(f'{PATH_TO_GLADIA_SRC}/{module_path}', 'env.yaml'),
                         cmd=cmd
                     )
 

@@ -35,10 +35,11 @@ ARG SKIP_YARN_CACHE_CLEANING="false"
 ARG SKIP_NPM_CACHE_CLEANING="false"
 ARG SKIP_TMPFILES_CACHE_CLEANING="false"
 ARG SKIP_NTLK_DL="false"
+ARG GLADIA_TMP_PATH="/tmp/gladia/"
+ARG MODEL_CACHE_ROOT=$GLADIA_TMP_PATH"/models"
+ARG PATH_TO_GLADIA_SRC="/app"
 
 ENV PIPENV_VENV_IN_PROJECT="enabled" \
-    GLADIA_TMP_PATH="/tmp/gladia/" \
-    MODEL_CACHE_ROOT=$GLADIA_TMP_PATH"/models" \
     TRANSFORMERS_CACHE=$MODEL_CACHE_ROOT"/transformers" \
     PYTORCH_TRANSFORMERS_CACHE=$MODEL_CACHE_ROOT"/pytorch_transformers" \
     PYTORCH_PRETRAINED_BERT_CACHE=$MODEL_CACHE_ROOT"/pytorch_pretrained_bert" \
@@ -49,11 +50,10 @@ ENV PIPENV_VENV_IN_PROJECT="enabled" \
     MINICONDA_INSTALL_PATH="/opt/conda" \
     distro="ubuntu2004" \
     arch="x86_64" \
-    TRITON_MODELS_PATH=GLADIA_TMP_PATH"/triton" \
+    TRITON_MODELS_PATH=$GLADIA_TMP_PATH"/triton" \
     TRITON_SERVER_PORT_HTTP=8000 \
     TRITON_SERVER_PORT_GRPC=8001 \
     TRITON_SERVER_PORT_METRICS=8002 \
-    PATH_TO_GLADIA_SRC="/app" \
     API_SERVER_PORT_HTTP=8080 \
     API_SERVER_WORKERS=1
 
@@ -86,6 +86,11 @@ RUN wget "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.11.0-Linux-x86_6
     ./Miniconda3-py38_4.11.0-Linux-x86_64.sh -b -p $MINICONDA_INSTALL_PATH && \
     echo ". $MINICONDA_INSTALL_PATH/etc/profile.d/conda.sh" >> ~/.bashrc && \
     echo "conda activate" >> ~/.bashrc
+
+# Install micromamba
+RUN wget -qO- "https://micro.mamba.pm/api/micromamba/linux-64/latest" | tar -xvj bin/micromamba
+RUN mv bin/micromamba /usr/local/bin/micromamba
+RUN micromamba shell init -s bash
 
 # Install Cmake
 RUN apt install -y libssl-dev && \

@@ -55,7 +55,13 @@ ENV PIPENV_VENV_IN_PROJECT="enabled" \
     TRITON_SERVER_PORT_GRPC=8001 \
     TRITON_SERVER_PORT_METRICS=8002 \
     API_SERVER_PORT_HTTP=8080 \
-    API_SERVER_WORKERS=1
+    API_SERVER_WORKERS=1 \ 
+    MAMBA_ROOT_PREFIX="/opt/micromamba" \
+    MAMBA_EXE="/usr/local/bin/micromamba" \
+    MAMBA_DOCKERFILE_ACTIVATE=1 \
+    MAMBA_ALWAYS_YES=true \
+    PATH=$PATH:/usr/local/bin/ \
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"/opt/micromamba/envs/server/lib/"
 
 RUN mkdir -p $TRITON_MODELS_PATH && \
     mkdir -p $GLADIA_TMP_PATH && \
@@ -88,9 +94,13 @@ RUN wget "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.11.0-Linux-x86_6
     echo "conda activate" >> ~/.bashrc
 
 # Install micromamba
-RUN wget -qO- "https://micro.mamba.pm/api/micromamba/linux-64/latest" | tar -xvj bin/micromamba
-RUN mv bin/micromamba /usr/local/bin/micromamba
-RUN micromamba shell init -s bash
+RUN wget -O micromamba.tar.bz2 "https://micro.mamba.pm/api/micromamba/linux-64/latest" &&  \
+    mkdir -p /tmp/umamba/ && \
+    tar -xvf micromamba.tar.bz2 -C /tmp/umamba/ && \
+    mv /tmp/umamba/bin/micromamba /usr/local/bin/micromamba && \
+    rm -rf /tmp/umamba
+
+#RUN micromamba shell init -s bash
 
 # Install Cmake
 RUN apt install -y libssl-dev && \
@@ -133,7 +143,7 @@ RUN apt-get update && \
         libmysqlclient-dev \
         libgl1 \
         software-properties-common && \
-    apt-get install -y \
+        apt-get install -y \
         cmake
 
 # Install terressact and its dependencies

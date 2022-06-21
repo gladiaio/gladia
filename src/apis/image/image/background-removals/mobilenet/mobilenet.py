@@ -30,8 +30,12 @@ def run(image: Image, fast: bool = True) -> (Image, np.ndarray):
     :return: image without its background
     """
 
-    global sess
-    sess = tf.Session()
+
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth=True
+
+    sess = tf.Session(config=config)
+
     INPUT_TENSOR_NAME = "ImageTensor:0"
     INPUT_SIZE = 513
     FROZEN_GRAPH_NAME = "frozen_inference_graph"
@@ -53,6 +57,9 @@ def run(image: Image, fast: bool = True) -> (Image, np.ndarray):
     )
 
     seg_map = batch_seg_map[0]
+
+    tf.reset_default_graph()
+    sess.close()
 
     return resized_image, seg_map
 

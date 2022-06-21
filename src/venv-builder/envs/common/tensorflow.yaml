@@ -2,6 +2,6 @@ name: common-tensorflow
 
 dependencies:
   - conda-forge::pip
+  - conda-forge::tensorflow
   - pip:
-    - tensorflow_gpu==2.8.0
     - -e /app/api_utils/

@@ -2,9 +2,7 @@ import os
 import re
 import sys
 import json
-import yaml
 import forge
-import asyncio
 import pathlib
 import inflect
 import tempfile
@@ -12,7 +10,6 @@ import warnings
 import starlette
 import importlib
 import subprocess
-import asyncio
 
 from shlex import quote
 from pathlib import Path
@@ -142,7 +139,8 @@ def exec_in_custom_env(path_to_env_file: str, cmd: str):
     try:
         full_cmd = f"""eval "$(micromamba shell hook --shell=bash)" && {cmd}"""
 
-        os.system(full_cmd)
+        process = subprocess.Popen(full_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, executable='/bin/bash')
+        output, error = process.communicate()
 
     except subprocess.CalledProcessError as error:
         raise RuntimeError(f"Couldn't activate custom env {env_name}: {error}")
@@ -261,6 +259,11 @@ class TaskRouter:
             # if a virtualenv
             if os.path.isfile(os.path.join(module_path, 'env.yaml')):
 
+                PATH_TO_GLADIA_SRC = os.getenv("PATH_TO_GLADIA_SRC", "/app")
+
+                print("IT IS A VIRTUALENV")
+                print(os.path.join(f'{PATH_TO_GLADIA_SRC}/{module_path}', 'env.yaml'))
+
                 routeur = singularize(self.root_package_path)
 
                 this_routeur = importlib.import_module(routeur.replace('/', '.'))
@@ -283,12 +286,10 @@ class TaskRouter:
 
                 output_tmp_result = tempfile.NamedTemporaryFile().name
                 sync = False
-                kwargs_str = json.dumps(kwargs).replace('"', '\\"')
+                kwargs_str = json.dumps(kwargs).replace('"', "'")
 
                 model = quote(model)
                 output_tmp_result = quote(output_tmp_result)
-
-                PATH_TO_GLADIA_SRC = os.getenv("PATH_TO_GLADIA_SRC", "/app")
 
                 cmd = f"""
 python -c "
@@ -334,8 +335,7 @@ else:
                 else:
                     file = open(output_tmp_result, "r")
                     result = file.read()
-                    file.close()    
-                
+                    file.close()
 
                 os.system(f"rm {output_tmp_result}")
 
@@ -343,6 +343,7 @@ else:
                     os.system(f"rm {input_file}")
 
             else:
+
                 this_module = importlib.machinery.SourceFileLoader(
                     model, f"{self.root_package_path}/{model}/{model}.py"
                 ).load_module()

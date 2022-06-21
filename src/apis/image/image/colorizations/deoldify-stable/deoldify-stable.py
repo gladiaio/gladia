@@ -47,4 +47,6 @@ def predict(image: bytes) -> Image:
         path=image, render_factor=render_factor
     )
 
+    del image_colorizer
+
     return result

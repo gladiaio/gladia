@@ -87,14 +87,6 @@ RUN wget "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.11.0-Linux-x86_6
     echo ". $MINICONDA_INSTALL_PATH/etc/profile.d/conda.sh" >> ~/.bashrc && \
     echo "conda activate" >> ~/.bashrc
 
-# Install Cmake
-RUN apt install -y libssl-dev && \
-    wget https://github.com/Kitware/CMake/releases/download/v3.20.0/cmake-3.20.0.tar.gz && \
-    tar -zxvf cmake-3.20.0.tar.gz > /dev/null && \
-    cd cmake-3.20.0 && ./bootstrap > /dev/null && \
-    make && \
-    make install
-
 COPY . $PATH_TO_GLADIA_SRC
 
 WORKDIR /tmp

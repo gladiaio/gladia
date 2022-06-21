@@ -70,20 +70,22 @@ RUN mkdir -p $TRITON_MODELS_PATH && \
     mkdir -p $PATH_TO_GLADIA_SRC
 
 # Update apt repositories
+# Add Nvidia GPG key
+RUN apt-key del 7fa2af80
+RUN wget https://developer.download.nvidia.com/compute/cuda/repos/$distro/$arch/cuda-keyring_1.0-1_all.deb
+
+RUN dpkg -i cuda-keyring_1.0-1_all.deb
+
+RUN sed -i 's/deb https:\/\/developer.download.nvidia.com\/compute\/cuda\/repos\/ubuntu2004\/x86_64.*//g' /etc/apt/sources.list
+
 RUN apt-get install -y apt-transport-https && \
     apt-get clean && \
     apt-get update --allow-insecure-repositories -y
 
-
 # Install Cmake
 RUN apt install -y libssl-dev && \
-    apt install -y libpng-dev libjpeg-dev && \
-    wget https://github.com/Kitware/CMake/releases/download/v3.20.0/cmake-3.20.0.tar.gz && \
-    tar -zxvf cmake-3.20.0.tar.gz > /dev/null && \
-    cd cmake-3.20.0 && ./bootstrap > /dev/null && \
-    make && \
-    make install
-
+    apt install -y libpng-dev libjpeg-dev
+    
 COPY . $PATH_TO_GLADIA_SRC
 
 WORKDIR /tmp
@@ -193,5 +195,4 @@ RUN updatedb
 
 ENTRYPOINT ["micromamba", "run", "-n", "server"]
 
-# CMD ["micromamba", "run", "-n", "server", "/app/run_server_prod.sh"]
 CMD ["/app/run_server_prod.sh"]

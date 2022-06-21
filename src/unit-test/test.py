@@ -1,5 +1,4 @@
 from time import sleep
-import json
 import sys
 import os
 
@@ -162,7 +161,6 @@ def main(url, bearer_token, specific_endpoints, continue_when_failed, after_endp
         if specific_endpoints:
             if path in specific_endpoints:
                 perform_test(details, url, header, path, skip_when_failed, max_retry)
-                nb_test_ran += 1
 
             elif after_endpoint != "":
                 if path in after_endpoint:
@@ -170,7 +168,6 @@ def main(url, bearer_token, specific_endpoints, continue_when_failed, after_endp
                     
                 if after_endpoint_continue:
                     perform_test(details, url, header, path, skip_when_failed, max_retry)
-                    nb_test_ran += 1
                 else:
                     print(f"|  |__ {status_skipped}  <Skipped>")
                     print(f"|")
@@ -187,14 +184,12 @@ def main(url, bearer_token, specific_endpoints, continue_when_failed, after_endp
                     
             if after_endpoint_continue:
                 perform_test(details, url, header, path, skip_when_failed, max_retry)
-                nb_test_ran += 1
             else:
                 print(f"|  |__ {status_skipped}  <Skipped>")
                 print(f"|")
                 nb_test_skipped += 1
         else:
             perform_test(details, url, header, path, skip_when_failed, max_retry)
-            nb_test_ran += 1
 
     if test_final_status == ExitStatus.success:
         str_final_status = "Success"

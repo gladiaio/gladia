@@ -123,17 +123,6 @@ def exec_in_custom_env(path_to_env_file: str, cmd: str):
 
     env_name = f"{task}-{model}"
 
-    # env_cfg = yaml.safe_load(open(path_to_env_file))
-
-    # env_to_inherit_from = ''
-    # if "inheritance" in env_cfg.keys() and len(env_cfg['inheritance']) > 0:
-    #     env_to_inherit_from = "micromamba activate " + "&& micromamba activate --stack ".join(env_cfg["inheritance"])
-
-    #     cmd = f"{env_to_inherit_from} && micromamba activate --stack {env_name} && {cmd}"
-
-    # else:
-    #     cmd = f"micromamba activate {env_name} && {cmd}"
-
     cmd = f"micromamba activate {env_name} && {cmd}"
 
     try:

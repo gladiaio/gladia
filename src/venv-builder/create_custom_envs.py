@@ -28,8 +28,6 @@ def create_temp_env_file(
     packages_to_install_from_pip: List[str]
 ) -> str:
 
-    print("Installing env name:", env_name, "\n", " - /" * 100)
-
     tmp = tempfile.NamedTemporaryFile(delete=False)
 
     content = """
@@ -82,6 +80,10 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
 
     except subprocess.CalledProcessError as error:
         raise RuntimeError(f"Couldn't create env {env_name}: {error}")
+
+    finally:
+        os.remove(temporary_file.name)
+        os.remove(temporary_file.name + ".yaml")
 
 
 def main():

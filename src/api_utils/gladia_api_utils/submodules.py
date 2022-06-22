@@ -131,6 +131,8 @@ def exec_in_custom_env(path_to_env_file: str, cmd: str):
         process = subprocess.Popen(full_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, executable='/bin/bash')
         output, error = process.communicate()
 
+        print(error)
+        
     except subprocess.CalledProcessError as error:
         raise RuntimeError(f"Couldn't activate custom env {env_name}: {error}")
 
@@ -250,7 +252,7 @@ class TaskRouter:
 
                 PATH_TO_GLADIA_SRC = os.getenv("PATH_TO_GLADIA_SRC", "/app")
 
-                print("IT IS A VIRTUALENV")
+                print("IT IS A VIRTUALENV --- ")
                 print(os.path.join(f'{PATH_TO_GLADIA_SRC}/{module_path}', 'env.yaml'))
 
                 routeur = singularize(self.root_package_path)
@@ -275,13 +277,12 @@ class TaskRouter:
 
                 output_tmp_result = tempfile.NamedTemporaryFile().name
                 sync = False
-                kwargs_str = json.dumps(kwargs).replace('"', "'")
 
                 model = quote(model)
                 output_tmp_result = quote(output_tmp_result)
 
                 cmd = f"""
-python -c "
+python - <<-EOF
 
 import os
 import importlib.util
@@ -295,14 +296,14 @@ this_module = importlib.util.module_from_spec(spec)
 
 spec.loader.exec_module(this_module)
 
-output = this_module.predict(**{kwargs_str})
+output = this_module.predict(**{kwargs})
 
 if isinstance(output, Image.Image):
     output.save('{output_tmp_result}', format='PNG')
 else:
     with open('{output_tmp_result}', 'w') as f:
         f.write(str(output))
-"
+EOF
 """
 
                 try:

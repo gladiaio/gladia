@@ -131,6 +131,8 @@ def exec_in_custom_env(path_to_env_file: str, cmd: str):
         process = subprocess.Popen(full_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, executable='/bin/bash')
         output, error = process.communicate()
 
+        print("[error]:", error)
+
     except subprocess.CalledProcessError as error:
         raise RuntimeError(f"Couldn't activate custom env {env_name}: {error}")
 

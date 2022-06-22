@@ -20,4 +20,7 @@ def predict(text: str) -> str:
     
     decoded = tokenizer.decode(outputs[0], skip_special_tokens=True, clean_up_tokenization_spaces=True)
 
+    del model
+    del tokenizer
+
     return decoded

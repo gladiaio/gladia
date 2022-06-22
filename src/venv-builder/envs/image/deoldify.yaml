@@ -1,0 +1,5 @@
+name: image-deoldify
+
+dependencies:
+    - pip:
+        - git+https://github.com/jqueguiner/DeOldify.git@master#egg=DeOldify

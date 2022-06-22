@@ -44,4 +44,9 @@ def predict(code_snippet: str) -> str:
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelWithLMHead.from_pretrained(model_name)
 
-    return generate(code_snippet, tokenizer, model)
+    out = generate(code_snippet, tokenizer, model)
+
+    del model
+    del tokenizer
+
+    return out

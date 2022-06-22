@@ -63,4 +63,6 @@ def predict(input_string: str) -> [dict]:
 
         predictions.append(pred)
 
+    del tokenizer
+    
     return predictions

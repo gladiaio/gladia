@@ -36,4 +36,8 @@ def predict(text: str) -> str:
     client.register_new_input(shape=(1, 256), datatype='INT32')
     output = client(input_ids.detach().numpy().astype(np.int32))[0]
 
-    return LABELS[np.argmax(output)]
+    out = LABELS[np.argmax(output)]
+
+    del tokenizer
+
+    return out

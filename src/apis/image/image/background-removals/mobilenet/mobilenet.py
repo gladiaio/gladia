@@ -30,7 +30,6 @@ def run(image: Image, fast: bool = True) -> (Image, np.ndarray):
     :return: image without its background
     """
 
-
     config = tf.ConfigProto()
     config.gpu_options.allow_growth=True
 

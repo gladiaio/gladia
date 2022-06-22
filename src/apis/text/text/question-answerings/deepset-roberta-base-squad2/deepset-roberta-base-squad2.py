@@ -14,4 +14,6 @@ def predict(context: str, question: str) -> str:
     happy_qa = HappyQuestionAnswering("ROBERTA", "deepset/roberta-base-squad2")
     result = happy_qa.answer_question(context, question)
 
+    del happy_qa
+
     return json.dumps({'answer': result[0].answer, 'score': result[0].score})

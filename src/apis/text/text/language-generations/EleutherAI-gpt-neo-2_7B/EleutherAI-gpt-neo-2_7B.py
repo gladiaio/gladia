@@ -12,4 +12,6 @@ def predict(text: str) -> str:
 
     res = generator(text, max_length=50, do_sample=True, temperature=0.9)
 
+    del generator
+
     return res[0]['generated_text']

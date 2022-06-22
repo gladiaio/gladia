@@ -13,4 +13,6 @@ def predict(sentence: str) -> str:
 
     result = happy_wp.predict_mask(f"{sentence} [MASK]")
 
+    del happy_wp
+
     return result[0].token

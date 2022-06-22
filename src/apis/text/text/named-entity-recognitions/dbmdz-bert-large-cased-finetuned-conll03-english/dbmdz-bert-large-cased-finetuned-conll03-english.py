@@ -43,4 +43,7 @@ def predict(text: str) -> [(str, str)]:
     outputs = model(inputs)[0]
     predictions = torch.argmax(outputs, dim=2)
 
+    del tokenizer
+    del model
+
     return [(token, label_list[prediction]) for token, prediction in zip(tokens, predictions[0].tolist())]

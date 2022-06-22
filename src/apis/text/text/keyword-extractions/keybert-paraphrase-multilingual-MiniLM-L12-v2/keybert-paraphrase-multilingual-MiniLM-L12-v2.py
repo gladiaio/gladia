@@ -10,7 +10,11 @@ def predict(text: str) -> [(str, float)]:
     from keybert import KeyBERT
     from sentence_transformers import SentenceTransformer
 
-    sentence_model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
-    kw_model = KeyBERT(model=sentence_model)
+    model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
+    kw_model = KeyBERT(model=model)
 
-    return kw_model.extract_keywords(text, keyphrase_ngram_range=(1, 1), stop_words=None)
+    out = kw_model.extract_keywords(text, keyphrase_ngram_range=(1, 1), stop_words=None)
+    
+    del model
+
+    return out

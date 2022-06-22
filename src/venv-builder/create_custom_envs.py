@@ -45,6 +45,7 @@ dependencies:""" + ''.join([f"\n  - {package}" for package in packages_to_instal
 
 
 def create_custom_env(env_name: str, path_to_env_file: str) -> None:
+    print(f"Creating env : {env_name}")
     custom_env = yaml.safe_load(open(path_to_env_file, "r"))
 
     packages_to_install_from_pip, packages_to_install_from_channel = retrieve_package_from_env_file(custom_env)

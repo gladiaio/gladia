@@ -42,5 +42,8 @@ def predict(context: str) -> [str]:
     for beam_output in beam_outputs:
         sent = tokenizer.decode(beam_output, skip_special_tokens=True, clean_up_tokenization_spaces=True)
         output.append(sent.replace("paraphrasedoutput: ", ""))
-
+    del tokenizer
+    del model
+    del encoding
+    del beam_outputs
     return output

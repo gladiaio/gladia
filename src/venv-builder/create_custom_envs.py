@@ -105,7 +105,7 @@ def main():
         models = list(filter(lambda dir : os.path.split(dir)[-1][0] not in ['_', '.'], os.listdir(task)))
 
         for model in models:
-            if "env.yaml" not in os.listdir(os.path.join(task, model)):
+            if not os.path.exists(os.path.join(task, model, "env.yaml")):
                 continue
 
             create_custom_env(

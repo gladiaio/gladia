@@ -46,6 +46,7 @@ dependencies:""" + ''.join([f"\n  - {package}" for package in packages_to_instal
 
 def create_custom_env(env_name: str, path_to_env_file: str) -> None:
     print(f"Creating env : {env_name}")
+
     custom_env = yaml.safe_load(open(path_to_env_file, "r"))
 
     packages_to_install_from_pip, packages_to_install_from_channel = retrieve_package_from_env_file(custom_env)
@@ -94,16 +95,23 @@ def main():
     )
 
     for task in tqdm(paths):
-        models = list(filter(lambda dir : os.path.split(dir)[-1][0] not in ['_', '.'], os.listdir(task)))
 
-        for model in models:
-            if "env.yaml" not in os.listdir(os.path.join(task, model)):
-                continue
-
+        if os.path.exists(os.path.join(task, "env.yaml")):
             create_custom_env(
-                env_name=f"{os.path.split(task)[-1]}-{model}", # FIXME: il y a aura un conflit entre le nom du dossier qui est au pluriel et le nom de la route qui est au singulier
-                path_to_env_file=os.path.join(task, model, 'env.yaml')
+                env_name=os.path.split(task)[1],
+                path_to_env_file=os.path.join(task, "env.yaml")
             )
+
+        # models = list(filter(lambda dir : os.path.split(dir)[-1][0] not in ['_', '.'], os.listdir(task)))
+
+        # for model in models:
+        #     if "env.yaml" not in os.listdir(os.path.join(task, model)):
+        #         continue
+
+        #     create_custom_env(
+        #         env_name=f"{os.path.split(task)[-1]}-{model}", # FIXME: il y a aura un conflit entre le nom du dossier qui est au pluriel et le nom de la route qui est au singulier
+        #         path_to_env_file=os.path.join(task, model, 'env.yaml')
+        #     )
 
 
 if __name__ == "__main__":

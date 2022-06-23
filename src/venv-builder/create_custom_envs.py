@@ -102,16 +102,16 @@ def main():
                 path_to_env_file=os.path.join(task, "env.yaml")
             )
 
-        # models = list(filter(lambda dir : os.path.split(dir)[-1][0] not in ['_', '.'], os.listdir(task)))
+        models = list(filter(lambda dir : os.path.split(dir)[-1][0] not in ['_', '.'], os.listdir(task)))
 
-        # for model in models:
-        #     if "env.yaml" not in os.listdir(os.path.join(task, model)):
-        #         continue
+        for model in models:
+            if "env.yaml" not in os.listdir(os.path.join(task, model)):
+                continue
 
-        #     create_custom_env(
-        #         env_name=f"{os.path.split(task)[-1]}-{model}", # FIXME: il y a aura un conflit entre le nom du dossier qui est au pluriel et le nom de la route qui est au singulier
-        #         path_to_env_file=os.path.join(task, model, 'env.yaml')
-        #     )
+            create_custom_env(
+                env_name=f"{os.path.split(task)[-1]}-{model}", # FIXME: il y a aura un conflit entre le nom du dossier qui est au pluriel et le nom de la route qui est au singulier
+                path_to_env_file=os.path.join(task, model, 'env.yaml')
+            )
 
 
 if __name__ == "__main__":

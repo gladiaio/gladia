@@ -47,6 +47,7 @@ dependencies:""" + ''.join([f"\n  - {package}" for package in packages_to_instal
 
 def create_custom_env(env_name: str, path_to_env_file: str) -> None:
     print(f"Creating env : {env_name}")
+
     custom_env = yaml.safe_load(open(path_to_env_file, "r"))
 
     packages_to_install_from_pip, packages_to_install_from_channel = retrieve_package_from_env_file(custom_env)
@@ -133,10 +134,17 @@ def build_env_for_activated_tasks(path_to_config_file: str, path_to_apis: str) -
     )
 
     for task in tqdm(paths):
+
+        if os.path.exists(os.path.join(task, "env.yaml")):
+            create_custom_env(
+                env_name=os.path.split(task)[1],
+                path_to_env_file=os.path.join(task, "env.yaml")
+            )
+
         models = list(filter(lambda dir : os.path.split(dir)[-1][0] not in ['_', '.'], os.listdir(task)))
 
         for model in models:
-            if "env.yaml" not in os.listdir(os.path.join(task, model)):
+            if not os.path.exists(os.path.join(task, model, "env.yaml")):
                 continue
 
             create_custom_env(

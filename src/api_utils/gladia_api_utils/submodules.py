@@ -25,6 +25,7 @@ versions = list()
 available_versions = list()
 
 PATTERN = re.compile(r'((\w:)|(\.))((/(?!/)(?!/)|\\{2})[^\n?"|></\\:*]+)+')
+PATH_TO_GLADIA_SRC = os.getenv("PATH_TO_GLADIA_SRC", "/app")
 
 
 def is_binary_file(file_path: str) -> bool:
@@ -115,14 +116,7 @@ def versions_list(root_path=None) -> list:
     return versions, package_path
 
 
-def exec_in_custom_env(path_to_env_file: str, cmd: str):
-    path = path_to_env_file.split("/")
-
-    task = path[-3]
-    model = path[-2]
-
-    env_name = f"{task}-{model}"
-
+def exec_in_custom_env(env_name: str, cmd: str):
     cmd = f"micromamba activate {env_name} && {cmd}"
 
     try:
@@ -135,6 +129,24 @@ def exec_in_custom_env(path_to_env_file: str, cmd: str):
 
     except subprocess.CalledProcessError as error:
         raise RuntimeError(f"Couldn't activate custom env {env_name}: {error}")
+
+
+def get_module_env_name(module_path: str) -> str:
+
+    if os.path.isfile(os.path.join(module_path, 'env.yaml')):
+        path = os.path.join(module_path, 'env.yaml').split("/")
+
+        task = path[-3]
+        model = path[-2]
+
+        return f"{task}-{model}"
+
+    elif os.path.isfile(os.path.join(module_path, "../", 'env.yaml')):
+        return os.path.split(os.path.split(os.path.split(module_path)[0])[0])[1]
+
+    else:
+        return None
+
 
 class TaskRouter:
     def __init__(self, router: APIRouter, input, output, default_model: str):
@@ -246,19 +258,12 @@ class TaskRouter:
                     detail=f"Model {model} does not exist"
                 )
 
-            # if a virtualenv
-            if os.path.isfile(os.path.join(module_path, 'env.yaml')):
+            env_name = get_module_env_name(module_path)
 
-                PATH_TO_GLADIA_SRC = os.getenv("PATH_TO_GLADIA_SRC", "/app")
-
-                print("IT IS A VIRTUALENV --- ")
-                print(os.path.join(f'{PATH_TO_GLADIA_SRC}/{module_path}', 'env.yaml'))
-
+            if env_name is not None:
                 routeur = singularize(self.root_package_path)
 
                 this_routeur = importlib.import_module(routeur.replace('/', '.'))
-
-                output = this_routeur.output
 
                 inputs = this_routeur.inputs
 
@@ -307,7 +312,7 @@ EOF
 
                 try:
                     exec_in_custom_env(
-                        path_to_env_file=os.path.join(f'{PATH_TO_GLADIA_SRC}/{module_path}', 'env.yaml'),
+                        env_name=env_name,
                         cmd=cmd
                     )
 

@@ -75,7 +75,6 @@ As for bug reports, feature requests are tracked as [GitHub issues](http://githu
   - Write what feature would you like to see integrated in GladIA
   - Precise why would this be useful to have this feature included
   - Imagine and write a workaround that we could do without this feature
-- Use a **clear and descriptive title** for the issue to identify the suggestion.
 
 ### Your first pull request
 

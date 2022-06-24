@@ -1,8 +1,8 @@
-# Contributing to Gladia
+# Contributing to GladIA
 
-First of all thank you for considering contributing to Gladia :raised_hands: . It's important to us that the community is included within the product lifecycle and it is thanks to people like you that we reach this objective, so we are grateful and we appreciate it :heart:.
+First of all thank you for considering contributing to GladIA :raised_hands: . It's important to us that the community is included within the product lifecycle and it is thanks to people like you that we reach this objective, so we are grateful and we appreciate it :heart:.
 
-All types of contributions are encouraged and valued, you can find how to contribute to Gladia and what you need to know before contributing in the [Table of Contents](#table-of-contents). Those are a set of guidelines for contributing, not rules. So feel free to propose any change regarding this file. We are eager to see your contributions 🎉.
+All types of contributions are encouraged and valued, you can find how to contribute to GladIA and what you need to know before contributing in the [Table of Contents](#table-of-contents). Those are a set of guidelines for contributing, not rules. So feel free to propose any change regarding this file. We are eager to see your contributions 🎉.
 
 ## Table of Contents
 
@@ -41,7 +41,7 @@ There are three ways to contribute to GladIA:
 This section describes how to write and submit a bug report. This includes crashes, memory leaks or any unexpected behaviours.
 
 #### What do I need to check before submitting my issue?
- * You use the latest version of Gladia
+ * You use the latest version of GladIA
  * You have all the correct dependencies
  * The issue doesn't already exist
  * Can you reliably reproduce the issue?
@@ -60,7 +60,7 @@ Once it's filed, a team member will try to reproduce the issue with your provide
 
 ### Your first feature request
 
-If you consider submitting an enhancement suggestion for Gladia, whether it is for a brand new feature or for a minor improvement, this section is for you!
+If you consider submitting an enhancement suggestion for GladIA, whether it is for a brand new feature or for a minor improvement, this section is for you!
 
 #### What should I do before submitting my feature request?
 

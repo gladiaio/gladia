@@ -1,5 +1,6 @@
 import os
 import yaml
+import argparse
 import tempfile
 import subprocess
 
@@ -46,6 +47,7 @@ dependencies:""" + ''.join([f"\n  - {package}" for package in packages_to_instal
 
 def create_custom_env(env_name: str, path_to_env_file: str) -> None:
     print(f"Creating env : {env_name}")
+
     custom_env = yaml.safe_load(open(path_to_env_file, "r"))
 
     packages_to_install_from_pip, packages_to_install_from_channel = retrieve_package_from_env_file(custom_env)
@@ -87,23 +89,89 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
         os.remove(temporary_file.name + ".yaml")
 
 
-def main():
+def build_specific_envs(paths: List[str]) -> None:
+    """Build mamba envs using the provided {paths}
+
+    Arguments:
+        paths {List[str]} -- List of path to either a model folder or a model's env file (env.yaml)
+
+    Raises:
+        FileNotFoundError: The profided model folder or env file couldn't be founded
+    """
+
+    paths = set(paths)
+
+    for path in paths:
+
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"custom env {path} not found, please specify a correct path either leading to a model or model's env file.")
+
+        if "env.yaml" in path:
+            path = os.path.split(path)[0]
+
+        task_path, model = os.path.split(path)
+        task = os.path.split(task_path)[1]
+
+        print("building", f"{task}-{model}")
+
+        create_custom_env(
+            env_name=f"{task}-{model}",
+            path_to_env_file=os.path.join(path, "env.yaml")
+        )
+
+
+def build_env_for_activated_tasks(path_to_config_file: str, path_to_apis: str) -> None:
+    """Build the mamba env for every activated tasks
+
+    Arguments:
+        path_to_config_file {str} -- Path to the general config file describing which tasks is activated
+        path_to_apis {str} -- Path to the Gladia's tasks
+    """
+
     paths = get_activated_task_path(
-        path_to_config_file="../config.json",
-        path_to_apis="../apis"
+        path_to_config_file=path_to_config_file,
+        path_to_apis=path_to_apis
     )
 
     for task in tqdm(paths):
+
+        if os.path.exists(os.path.join(task, "env.yaml")):
+            create_custom_env(
+                env_name=os.path.split(task)[1],
+                path_to_env_file=os.path.join(task, "env.yaml")
+            )
+
         models = list(filter(lambda dir : os.path.split(dir)[-1][0] not in ['_', '.'], os.listdir(task)))
 
         for model in models:
-            if "env.yaml" not in os.listdir(os.path.join(task, model)):
+            if not os.path.exists(os.path.join(task, model, "env.yaml")):
                 continue
 
             create_custom_env(
                 env_name=f"{os.path.split(task)[-1]}-{model}", # FIXME: il y a aura un conflit entre le nom du dossier qui est au pluriel et le nom de la route qui est au singulier
                 path_to_env_file=os.path.join(task, model, 'env.yaml')
             )
+
+
+def main():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        '--name',
+        action='append',
+        type=str,
+        help='Specify the name of a specific env to build. You can define this arg multiple time to build multiple specific envs.'
+    )
+
+    args = parser.parse_args()
+
+    if args.name:
+        return build_specific_envs(args.name)
+
+    return build_env_for_activated_tasks(
+        path_to_config_file="../config.json",
+        path_to_apis="../apis"
+    )
 
 
 if __name__ == "__main__":

@@ -29,10 +29,11 @@ def commit_should_run(commit_short="", repo="", gh_token=""):
   
   #0 is ok
   #1 is nok
+  to_exclude = ["WIP/", "DOC/"]
   skip_build = True
   print(commit_short)
   for pr in pulls:
-    if "WIP" not in pr.title:    
+    if not any(exclusion in pr.title for exclusion in to_exclude):
       pr_number = pr.number
       print(f"- looking into {pr.title}")
       req = requests.get(f'https://api.github.com/repos/gladiaio/gladia/pulls/{pr_number}/commits')

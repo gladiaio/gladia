@@ -96,7 +96,7 @@ You can log in one the instances and run the tests
 ```sh
 docker-compose exec gladia /bin/bash
 cd unit-test
-python test.py
+python test.py -c
 ```
 
 

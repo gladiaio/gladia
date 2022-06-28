@@ -7,14 +7,14 @@ inputs = [
     {
         "type": "text",
         "name": "sentence_1",
-        "default": "I like Python because I can build AI applications",
+        "default": "",
         "placeholder": "I like Python because I can do data analytics",
         "tooltip": "Insert the text to compare here",
     },
     {
         "type": "text",
         "name": "sentence_2",
-        "default": "Second sentence to compare to",
+        "default": "",
         "placeholder": "Second sentence to compare to",
         "tooltip": "Insert the text to compare here",
     },

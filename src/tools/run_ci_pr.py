@@ -33,7 +33,7 @@ def commit_should_run(commit_short="", repo="", gh_token=""):
   skip_build = True
   print(commit_short)
   for pr in pulls:
-    if not any(exclusion in pr.title[0:2].upper() for exclusion in to_exclude):
+    if not any(exclusion in pr.title[0:3].upper() for exclusion in to_exclude):
       pr_number = pr.number
       print(f"- looking into {pr.title}")
       req = requests.get(f'https://api.github.com/repos/gladiaio/gladia/pulls/{pr_number}/commits')

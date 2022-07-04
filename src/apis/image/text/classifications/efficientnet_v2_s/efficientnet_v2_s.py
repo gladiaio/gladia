@@ -1,6 +1,6 @@
 from torchvision.io import read_image
 from torchvision.models import efficientnet_v2_s, EfficientNet_V2_S_Weights
-
+import torch
 
 from gladia_api_utils.io import _open
 
@@ -29,5 +29,6 @@ def predict(image: bytes, top_k: int = 1) -> [str]:
 
     del model
     del weights
+    torch.cuda.empty_cache()
 
     return output

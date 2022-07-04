@@ -26,4 +26,8 @@ def predict(image: bytes, top_k: int = 1) -> [str]:
     category_name = weights.meta["categories"][class_id]
 
     output.append({"class": category_name, "score": score})
+
+    del model
+    del weights
+
     return output

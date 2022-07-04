@@ -1,5 +1,5 @@
 from torchvision.io import read_image
-from torchvision.models import inception_v3, Inception_V3_Weights
+from torchvision.models import mnasnet0_5, MNASNet0_5_Weights
 
 
 from gladia_api_utils.io import _open
@@ -9,8 +9,8 @@ def predict(image: bytes, top_k: int = 1) -> [str]:
     img = _open(image)
 
     output = list()
-    weights = Inception_V3_Weights.DEFAULT
-    model = inception_v3(weights=weights)
+    weights = MNASNet0_5_Weights.DEFAULT
+    model = mnasnet0_5(weights=weights)
     model.eval()
 
     # Step 2: Initialize the inference transforms

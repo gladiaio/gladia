@@ -9,7 +9,14 @@ inputs = [
         "default": "Image classification",
         "placeholder": "Image to classify",
         "tooltip": "Image to classify",
-    }
+    },
+    {
+        "type": "text",
+        "name": "top_k",
+        "default": "1",
+        "placeholder": "Top K",
+        "tooltip": "Top K",
+    },
 ]
 
 output = {"name": "classified_image", "type": "text", "example": "class: probability%"}

@@ -124,7 +124,7 @@ python test.py -c
 
 ## As a new developer, very first steps in full control
 
-We created a [dedicated page](./src/howto101.md) with detailed instructions on how, as a new develper, to perform few actions. The objective is for the new developer to be in full control while performing the following first steps :
+We created a [dedicated page](./src/howto101.md) with detailed instructions on how, as a new develper, to perform few first steps actions. The objective is for the new developer to be in full control while performing the following first steps :
 
 1. To be able to build and run your own image based on the repository sources
 2. Make a first API call to your own newly running container

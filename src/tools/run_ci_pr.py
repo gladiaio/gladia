@@ -102,6 +102,13 @@ def has_only_pr_with_prefix(response, prefix_to_check, verbose):
     help="Return PR ids to the commit",
 )
 @click.option(
+    "--first_pr_only",
+    is_flag=True,
+    show_default=False,
+    default=False,
+    help="Return PR the first PR where the commit appears",
+)
+@click.option(
     "--deploy_message",
     is_flag=True,
     show_default=False,
@@ -120,6 +127,7 @@ def commit_should_run(
     break_if_no_pr=False,
     return_pr=False,
     pr_nb_only=False,
+    first_pr_only=False,
     deploy_message=False,
     verbose=False,
 ):
@@ -158,13 +166,16 @@ def commit_should_run(
             if data["total_count"] > 0:
                 for pr in data["items"]:
                     if pr_nb_only:
-                        prs.append(str(pr["number"]))
+                        prs.append(int(pr["number"]))
                         this_pr = pr
 
                     else:
                         prs.append(f'[{pr["number"]}] {pr["title"]}')
             if not deploy_message:
-                print(" | ".join(prs))
+                if first_pr_only:
+                    print(min(prs))
+                else:
+                    print(" | ".join(map(str, prs)))
 
             if deploy_message:
                 if this_pr:

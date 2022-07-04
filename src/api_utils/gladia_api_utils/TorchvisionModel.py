@@ -1,4 +1,3 @@
-
 from .io import _open
 from typing import Dict, List
 from torch import topk as get_top_k
@@ -6,11 +5,12 @@ from torchvision.io import read_image
 from torchvision import models as torchvision_models
 
 
-class TorchvisionModel():
-    """Wrapping class for torchvision.models
-    """
+class TorchvisionModel:
+    """Wrapping class for torchvision.models"""
 
-    def __init__(self, model_name: str, weights: str, weights_version: str = "DEFAULT") -> None:
+    def __init__(
+        self, model_name: str, weights: str, weights_version: str = "DEFAULT"
+    ) -> None:
         """Initialize the TorchvisionModel class
 
         Args:
@@ -42,14 +42,15 @@ class TorchvisionModel():
 
         prediction = self.__model(preprocessed_image).squeeze(0).softmax(0)
 
-
         top_class_ids = get_top_k(prediction, top_k).indices
 
         output = []
         for class_id in top_class_ids:
-            output.append({
-                "class": self.__weights.meta["categories"][class_id],
-                "score": prediction[class_id].item()
-            })
+            output.append(
+                {
+                    "class": self.__weights.meta["categories"][class_id],
+                    "score": prediction[class_id].item(),
+                }
+            )
 
         return output

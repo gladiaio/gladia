@@ -11,7 +11,7 @@ def predict(image: bytes, top_k: int = 1) -> [str]:
 
     weights = MNASNet0_5_Weights.DEFAULT
     model = mnasnet0_5(weights=weights)
-    
+
     model.eval()
 
     # Step 2: Initialize the inference transforms

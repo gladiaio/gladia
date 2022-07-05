@@ -200,35 +200,59 @@ def commit_should_run(
 
                         if item["event"] == "committed":
                             if item["committer"]["name"] != "GitHub":
-                                if item["message"].startswith("feat") or item[
-                                    "message"
-                                ].startswith("add"):
+                                if (
+                                    item["message"].startswith("feat")
+                                    or item["message"].startswith("add")
+                                    or item["message"].startswith("(feat)")
+                                ):
                                     deploy_message += "✨"
-                                elif item["message"].startswith("fix"):
+                                elif item["message"].startswith("fix") or item[
+                                    "message"
+                                ].startswith("(fix)"):
                                     deploy_message += "🐛"
-                                elif item["message"].startswith("docs"):
+                                elif item["message"].startswith("docs") or item[
+                                    "message"
+                                ].startswith("(docs)"):
                                     deploy_message += "📚"
-                                elif item["message"].startswith("style") or item[
-                                    "message"
-                                ].startswith("format"):
+                                elif (
+                                    item["message"].startswith("style")
+                                    or item["message"].startswith("format")
+                                    or item["message"].startswith("(style)")
+                                ):
                                     deploy_message += "💄"
-                                elif item["message"].startswith("refactor"):
-                                    deploy_message += "🔧"
-                                elif item["message"].startswith("test"):
-                                    deploy_message += "🔬"
-                                elif item["message"].startswith("chore"):
-                                    deploy_message += "📝"
-                                elif item["message"].startswith("ci"):
-                                    deploy_message += "🚧"
-                                elif item["message"].startswith("revert"):
-                                    deploy_message += "🔙"
-                                elif item["message"].startswith("perf") or item[
+                                elif item["message"].startswith("refactor") or item[
                                     "message"
-                                ].startswith("improve"):
-                                    deploy_message += "🏃"
-                                elif item["message"].startswith("build"):
+                                ].startswith("(refactor)"):
+                                    deploy_message += "🔧"
+                                elif item["message"].startswith("test") or item[
+                                    "message"
+                                ].startswith("(test)"):
+                                    deploy_message += "🔬"
+                                elif item["message"].startswith("chore") or item[
+                                    "message"
+                                ].startswith("(chore)"):
+                                    deploy_message += "📝"
+                                elif item["message"].startswith("ci") or item[
+                                    "message"
+                                ].startswith("(ci)"):
                                     deploy_message += "🚧"
-                                elif item["message"].startswith("release"):
+                                elif item["message"].startswith("revert") or item[
+                                    "message"
+                                ].startswith("(revert)"):
+                                    deploy_message += "🔙"
+                                elif (
+                                    item["message"].startswith("perf")
+                                    or item["message"].startswith("improve")
+                                    or item["message"].startswith("(perf)")
+                                ):
+                                    deploy_message += "🏃"
+                                elif item["message"].startswith("build") or item[
+                                    "message"
+                                ].startswith("(build)"):
+                                    deploy_message += "🚧"
+                                elif item["message"].startswith("release") or item[
+                                    "message"
+                                ].startswith("(release)"):
                                     deploy_message += "🏷"
                                 else:
                                     deploy_message += "💬"

@@ -17,9 +17,4 @@ def predict(text: str) -> str:
     )
     result = happy_tc.classify_text(text)
 
-    return json.dumps(
-        {
-            "label": result.label,
-            "score": result.score,
-        }
-    )
+    return json.dumps({"label": result.label, "score": result.score})

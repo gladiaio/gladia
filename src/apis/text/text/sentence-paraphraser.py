@@ -10,7 +10,7 @@ inputs = [
         "default": "Once, a group of frogs was roaming around the forest in search of water.",
         "placeholder": "Once, a group of frogs was roaming around the forest in search of water.",
         "tooltip": "Insert the text to paraphrase here",
-    },
+    }
 ]
 
 output = {"name": "paraphrased_text", "type": "str", "example": "paraphrased_text"}

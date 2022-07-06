@@ -10,7 +10,7 @@ inputs = [
         "default": "I think therefore I",
         "placeholder": "I think therefore I",
         "tooltip": "Insert the text to find the next word from.",
-    },
+    }
 ]
 
 output = {"name": "next_word", "type": "str", "example": "next word"}

@@ -10,7 +10,7 @@ inputs = [
         "default": "I like you. I love you",
         "placeholder": "I like you. I love you",
         "tooltip": "Insert the text to anlayse sentiment from",
-    },
+    }
 ]
 
 output = {"name": "results", "type": "list", "example": "results"}

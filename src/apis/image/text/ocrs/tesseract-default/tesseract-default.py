@@ -25,10 +25,7 @@ def predict(image: bytes, source_language: str) -> [str]:
     gray_image = cv2.cvtColor(np_image, cv2.COLOR_BGR2GRAY)
 
     gray_thresh = cv2.threshold(
-        src=gray_image,
-        thresh=0,
-        maxval=255,
-        type=cv2.THRESH_BINARY | cv2.THRESH_OTSU,
+        src=gray_image, thresh=0, maxval=255, type=cv2.THRESH_BINARY | cv2.THRESH_OTSU
     )[1]
 
     text = pytesseract.image_to_string(gray_thresh)

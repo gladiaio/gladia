@@ -179,11 +179,7 @@ def create_model(input_type, output_type, task_name, model_name, inputs, output)
         task_routeur_inputs = task_routeur.inputs
         inputs = []
         for input in task_routeur_inputs:
-            inputs.append(
-                {
-                    "input_name": input["name"],
-                }
-            )
+            inputs.append({"input_name": input["name"]})
 
     with open(os.path.join(model_path, f"{model_name}.py"), "w") as f:
         f.write(
@@ -219,7 +215,7 @@ def scaffold_task():
             message="What is the main input type ?",
             choices=["image", "text", "sound", "video"],
             default="image",
-        ),
+        )
     ]
 
     input_type = inquirer.prompt(set_main_input, theme=GreenPassion())[
@@ -232,7 +228,7 @@ def scaffold_task():
             message="What is the main output type ?",
             choices=["image", "text", "sound", "video"],
             default="image",
-        ),
+        )
     ]
 
     output_type = inquirer.prompt(set_main_output, theme=GreenPassion())[
@@ -245,7 +241,7 @@ def scaffold_task():
             message="What is the task name ?",
             default="task_name_no_space_dash_only"
             # validate=lambda x: x != ""
-        ),
+        )
     ]
 
     task_name = inquirer.prompt(set_task_name, theme=GreenPassion())[
@@ -315,7 +311,7 @@ def scaffold_task():
                 "element",
                 message=f"Set a new element variables for the task {task_name}",
                 choices=["input", "output", "done"],
-            ),
+            )
         ]
         added_element = dict()
         added_element["element"] = None

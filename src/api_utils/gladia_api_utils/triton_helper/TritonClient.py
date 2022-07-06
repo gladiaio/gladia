@@ -31,9 +31,7 @@ class TritonClient:
         self.__registered_inputs = []
 
         self.__registered_outputs = [
-            tritonclient.InferRequestedOutput(
-                name=f"output__0",
-            ),
+            tritonclient.InferRequestedOutput(name=f"output__0")
         ]
 
         if os.getenv("TRITON_MODELS_PATH") == "":
@@ -70,7 +68,7 @@ class TritonClient:
 
         self.__registered_outputs.append(
             tritonclient.InferRequestedOutput(
-                name=f"ouput__{len(self.__registered_outputs)}",
+                name=f"ouput__{len(self.__registered_outputs)}"
             )
         )
 
@@ -125,9 +123,7 @@ class TritonClient:
 
         response = requests.post(
             url=f"http://{self.__triton_server_url}/v2/repository/models/{self.__model_name}/unload",
-            data={
-                "unload_dependents": True,
-            },
+            data={"unload_dependents": True},
         )
 
         if response.status_code != 200:

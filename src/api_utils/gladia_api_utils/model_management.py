@@ -106,11 +106,7 @@ def download_models(model_list: dict) -> dict:
                 )
 
             t = threading.Thread(
-                target=download_model,
-                args=(
-                    model["url"],
-                    model["output_path"],
-                ),
+                target=download_model, args=(model["url"], model["output_path"])
             )
             output[key] = model
             threads.append(t)

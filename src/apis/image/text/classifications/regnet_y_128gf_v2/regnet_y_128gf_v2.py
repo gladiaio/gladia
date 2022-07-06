@@ -6,8 +6,8 @@ def predict(image: bytes, top_k: int = 1) -> [str]:
     img = _open(image)
 
     model = TorchvisionModel(
-        model_name="regnet_x_128gf",
-        weights="RegNet_X_128GF_Weights",
+        model_name="regnet_y_128gf",
+        weights="RegNet_Y_128GF_Weights",
         weights_version="IMAGENET1K_V2",
     )
     output = model(img, top_k)

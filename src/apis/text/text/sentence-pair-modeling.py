@@ -10,7 +10,7 @@ inputs = [
         "default": "Once, a group of frogs was roaming around the forest in search of water.",
         "placeholder": "Once, a group of frogs was roaming around the forest in search of water.",
         "tooltip": "Insert the sentence to perform the Pairwise Sentence Scoring Tasks",
-    },
+    }
 ]
 
 output = {"name": "analyzed_sentence", "type": "str", "example": "analyzed_sentence"}

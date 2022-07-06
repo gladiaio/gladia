@@ -10,7 +10,7 @@ inputs = [
         "default": "Text to analyzed",
         "placeholder": "Text to analyzed",
         "tooltip": "Insert the text to analyzed here",
-    },
+    }
 ]
 
 output = {"name": "analyzed_text", "type": "str", "example": "analyzed_text"}

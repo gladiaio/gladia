@@ -88,7 +88,7 @@ def get_module_infos(root_path=None) -> list:
     return task, plugin, tags
 
 
-def versions_list(root_path=None) -> list:
+def get_model_versions(root_path=None) -> dict:
     # used for relative paths
     if root_path:
         rel_path = root_path
@@ -103,15 +103,28 @@ def versions_list(root_path=None) -> list:
     sub_dir_to_crawl = f"{os.path.splitext(os.path.basename(rel_path))[0]}"
     sub_dir_to_crawl = pluralize(sub_dir_to_crawl)
 
-    versions = list()
+    versions = dict()
     package_path = str(Path(rel_path).parent.joinpath(sub_dir_to_crawl))
-
-    # package = SourceFileLoader(sub_dir_to_crawl, package_path).load_module()
 
     for fname in os.listdir(package_path):
         if os.path.isdir(os.path.join(package_path, fname)):
-            if pathlib.Path(os.path.join(package_path, fname, "__init__.py")).exists():
-                versions.append(fname)
+
+            if not pathlib.Path(
+                os.path.join(package_path, fname, "__init__.py")
+            ).exists():
+                continue
+
+            versions[fname] = {}
+
+            if pathlib.Path(os.path.join(package_path, fname, "config.yaml")).exists():
+                model_config = yaml.safe_load(
+                    os.path.join(package_path, fname, "config.yaml")
+                )
+
+                if "latency_grade_in_ms" in model_config.keys():
+                    versions[fname]["latency_grade"] = model_config[
+                        "latency_grade_in_ms"
+                    ]
 
     return versions, package_path
 
@@ -169,7 +182,7 @@ class TaskRouter:
         )
 
         self.task, self.plugin, self.tags = get_module_infos(root_path=rel_path)
-        self.versions, self.root_package_path = versions_list(rel_path)
+        self.versions, self.root_package_path = get_model_versions(rel_path)
 
         if not self.__check_if_model_exist(self.root_package_path, default_model):
             return
@@ -208,7 +221,9 @@ class TaskRouter:
 
         input_list.append(
             forge.arg(
-                "model", type=str, default=Query(self.default_model, enum=self.versions)
+                "model",
+                type=str,
+                default=Query(self.default_model, enum=set(self.versions.keys())),
             )
         )
 

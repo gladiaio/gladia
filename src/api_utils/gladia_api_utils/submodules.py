@@ -109,16 +109,22 @@ def get_model_versions(root_path=None) -> dict:
     for fname in os.listdir(package_path):
         if os.path.isdir(os.path.join(package_path, fname)):
 
-            if not pathlib.Path(os.path.join(package_path, fname, "__init__.py")).exists():
+            if not pathlib.Path(
+                os.path.join(package_path, fname, "__init__.py")
+            ).exists():
                 continue
 
             versions[fname] = {}
 
             if pathlib.Path(os.path.join(package_path, fname, "config.yaml")).exists():
-                model_config = yaml.safe_load(os.path.join(package_path, fname, "config.yaml"))
+                model_config = yaml.safe_load(
+                    os.path.join(package_path, fname, "config.yaml")
+                )
 
                 if "latency_grade_in_ms" in model_config.keys():
-                    versions[fname]["latency_grade"] = model_config["latency_grade_in_ms"]
+                    versions[fname]["latency_grade"] = model_config[
+                        "latency_grade_in_ms"
+                    ]
 
     return versions, package_path
 
@@ -215,7 +221,9 @@ class TaskRouter:
 
         input_list.append(
             forge.arg(
-                "model", type=str, default=Query(self.default_model, enum=set(self.versions.keys()))
+                "model",
+                type=str,
+                default=Query(self.default_model, enum=set(self.versions.keys())),
             )
         )
 

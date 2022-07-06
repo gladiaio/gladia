@@ -43,7 +43,7 @@ class TorchvisionModel:
 
         prediction = self.__model(preprocessed_image).squeeze(0).softmax(0)
 
-        top_class_ids = get_top_k(prediction, top_k).indices
+        top_class_ids = get_top_k(prediction, int(top_k)).indices
 
         output = []
         for class_id in top_class_ids:

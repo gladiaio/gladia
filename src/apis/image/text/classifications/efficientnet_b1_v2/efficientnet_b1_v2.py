@@ -1,4 +1,4 @@
-from gladia_api_utils import TorchvisionModel
+from gladia_api_utils.TorchvisionModelHelper import TorchvisionModel
 from gladia_api_utils.io import _open
 
 

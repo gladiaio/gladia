@@ -254,6 +254,8 @@ def commit_should_run(
                                     "message"
                                 ].startswith("(release)"):
                                     deploy_message += "🏷"
+                                elif item["message"].startswith("[pre-commit.ci]"):
+                                    pass
                                 else:
                                     deploy_message += "💬"
 

@@ -1,7 +1,6 @@
 from .io import _open
 from typing import Dict, List
 from torch import topk as get_top_k
-
 from torchvision.io import read_image
 from torchvision import models as torchvision_models
 

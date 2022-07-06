@@ -107,7 +107,8 @@ We use pre-commit to run Git hooks before submitting the code to review. These h
 	```
 * Install automatically all hooks listed in `.pre-commit-config.yaml` with 
 ```bash
-> pre-commit install
+> pre-commit install --hook-type pre-commit
+> pre-commit install --hook-type commit-msg
 ```  
 
 For now on, all hooks will run right before each commit. If you try to commit a non-compliant (i.e. badly formatted) file, `pre-commit` will modify this file and make the commit fail. However you need to stage the new changes **yourself** as `pre-commit` will not do that for you (this is by design). Fortunately, `pre-commit` outputs useful messages.
@@ -122,8 +123,6 @@ This setup :
 
 * Ensures that we have a consistent code style policy accross all codebase
 * Ensures that the contributing developer has the proper tools to make her code compliant
-
-We are using [commitizen](https://commitizen-tools.github.io/commitizen/) to format our commit messages. You are free to use it as well. Nevertheless, as `commitizen` has been added to the pre-commit hooks, if your commit message is not compliant with `commitizen` standard, then it will be rejected by the pre-commit hook (locally if you installed the pre-commit hooks and in the GitHub Action running all the hools as well).
 
 ## FAQ
 > I have a question, where can I ask it?

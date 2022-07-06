@@ -11,9 +11,9 @@ inputs = [
         "tooltip": "Image to classify",
     },
     {
-        "type": "text",
+        "type": "int",
         "name": "top_k",
-        "default": "1",
+        "default": 1,
         "placeholder": "Top K",
         "tooltip": "Top K",
     },

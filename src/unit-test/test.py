@@ -77,9 +77,7 @@ def perform_test(details, url, header, path, skip_when_failed, max_retry=3):
 
         if input == "image":
             params = (("model", model),)
-            files = {
-                "image": ("test.jpg", open("test.jpg", "rb")),
-            }
+            files = {"image": ("test.jpg", open("test.jpg", "rb"))}
 
             response = request_endpoint(
                 url=url,
@@ -100,9 +98,7 @@ def perform_test(details, url, header, path, skip_when_failed, max_retry=3):
                 test_final_status = ExitStatus_failure
 
         elif input == "text":
-            params = [
-                ("model", model),
-            ]
+            params = [("model", model)]
 
             for parameter in details["post"]["parameters"]:
                 if parameter["schema"]["title"] != "Model":

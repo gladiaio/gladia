@@ -25,9 +25,10 @@ def predict(context: str) -> [str]:
     encoding = tokenizer.encode_plus(
         text, max_length=128, padding="max_length", return_tensors="pt"
     )
-    input_ids, attention_mask = encoding["input_ids"].to(device), encoding[
-        "attention_mask"
-    ].to(device)
+    input_ids, attention_mask = (
+        encoding["input_ids"].to(device),
+        encoding["attention_mask"].to(device),
+    )
 
     beam_outputs = model.generate(
         input_ids=input_ids,

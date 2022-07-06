@@ -10,7 +10,7 @@ inputs = [
         "default": "Input text to perform language detection on",
         "placeholder": "Input text to perform language detection on",
         "tooltip": "Insert the text to perform language detection on",
-    },
+    }
 ]
 
 output = {"name": "generated_text", "type": "str", "example": "generated_text"}

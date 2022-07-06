@@ -22,10 +22,7 @@ setup(
     author_email="jlqueguiner@gladia.io",
     keywords="ai api fastapi artificial_intelligence gladia",
     license="MIT",
-    packages=[
-        "gladia_api_utils",
-        "gladia_api_utils.triton_helper",
-    ],
+    packages=["gladia_api_utils", "gladia_api_utils.triton_helper"],
     install_requires=[
         "PyYAML",
         "requests",

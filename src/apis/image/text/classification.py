@@ -23,4 +23,4 @@ output = {"name": "classified_image", "type": "text", "example": "class: probabi
 
 router = APIRouter()
 
-TaskRouter(router=router, input=inputs, output=output, default_model="resnet50")
+TaskRouter(router=router, input=inputs, output=output, default_model="alexnet")

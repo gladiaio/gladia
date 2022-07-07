@@ -10,7 +10,7 @@ inputs = [
         "default": "def is_palendrome(s):",
         "placeholder": "Input code to get programing language from",
         "tooltip": "Input code to get programing language from",
-    },
+    }
 ]
 
 output = {"name": "classified_code", "type": "list", "example": "classified_code"}

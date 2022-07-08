@@ -36,7 +36,9 @@ def has_only_pr_with_prefix(response, prefix_to_check, verbose):
 
             # if the PR title doesn't contains the prefix
             # in the first characters of the title
-            if not pr["title"].upper().startswith(prefix_to_check.upper()):
+            if not pr["title"].upper().startswith(prefix_to_check.upper()) and not pr[
+                "title"
+            ].upper().startswith(f"({prefix_to_check.upper()})"):
                 only_prs_with_prefix = False
                 break
         if verbose:

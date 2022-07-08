@@ -3,13 +3,14 @@ from typing import Dict, List
 from torch import topk as get_top_k
 from torchvision.io import read_image
 from torchvision import models as torchvision_models
+from torchvision.models import quantization as torchvision_quantized_models
 
 
 class TorchvisionModel:
     """Wrapping class for torchvision.models"""
 
     def __init__(
-        self, model_name: str, weights: str, weights_version: str = "DEFAULT"
+        self, model_name: str, weights: str, weights_version: str = "DEFAULT", quantized: bool = False
     ) -> None:
         """Initialize the TorchvisionModel class
 
@@ -18,11 +19,18 @@ class TorchvisionModel:
             weights (str): weights to load (must be the same named as in torchvision.models)
             weights_version (str, optional): version of the weights to load. Defaults to "DEFAULT".
         """
-
-        self.__weights = getattr(torchvision_models, weights)
+        if quantized:
+            self.__weights = getattr(torchvision_quantized_models, weights)
+        else:
+            self.__weights = getattr(torchvision_models, weights)
+        
         self.__weights = getattr(self.__weights, weights_version)
 
-        self.__model = getattr(torchvision_models, model_name)(weights=self.__weights)
+        if quantized:
+            self.__model = getattr(torchvision_quantized_models, model_name)(weights=self.__weights, quantize=True)
+        else:
+            self.__model = getattr(torchvision_models, model_name)(weights=self.__weights)
+        
         self.__model.eval()
 
         self.__preprocessing = self.__weights.transforms()

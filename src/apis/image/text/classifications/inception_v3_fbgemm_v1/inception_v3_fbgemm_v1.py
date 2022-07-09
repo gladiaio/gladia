@@ -6,7 +6,10 @@ def predict(image: bytes, top_k: int = 1) -> [str]:
     img = _open(image)
 
     model = TorchvisionModel(
-        model_name="inception_v3", weights="Inception_V3_Weights", quantized=True
+        model_name="inception_v3",
+        weights="Inception_V3_QuantizedWeights",
+        weights_version="IMAGENET1K_FBGEMM_V1",
+        quantized=True,
     )
     output = model(img, top_k)
 

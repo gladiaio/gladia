@@ -9,6 +9,7 @@ def predict(image: bytes, top_k: int = 1) -> [str]:
         model_name="mobilenet_v3_large",
         weights="MobileNet_V3_Large_QuantizedWeights",
         weights_version="IMAGENET1K_QNNPACK_V1",
+        quantized=True,
     )
     output = model(img, top_k)
 

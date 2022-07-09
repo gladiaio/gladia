@@ -7,8 +7,9 @@ def predict(image: bytes, top_k: int = 1) -> [str]:
 
     model = TorchvisionModel(
         model_name="mobilenet_v2",
-        weights="MobileNet_V2_Weights",
-        weights_version="IMAGENET1K_V2",
+        weights="MobileNet_V2_QuantizedWeights",
+        weights_version="IMAGENET1K_QNNPACK_V1",
+        quantized=True,
     )
     output = model(img, top_k)
 

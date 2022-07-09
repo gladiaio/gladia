@@ -10,7 +10,7 @@ def predict(image: bytes, top_k: int = 1) -> [str]:
         model_name="resnext101_64x4d",
         weights="resnext101_64x4d_quantized_fbgemm_v1",
         weights_version="IMAGENET1K_FBGEMM_V1",
-        quantized=True
+        quantized=True,
     )
     output = model(img, top_k)
 

@@ -8,7 +8,7 @@ def predict(image: bytes, top_k: int = 1) -> [str]:
 
     model = TorchvisionModel(
         model_name="resnext101_64x4d",
-        weights="resnext101_64x4d_quantized_fbgemm_v1",
+        weights="ResNeXt101_64X4D_QuantizedWeights",
         weights_version="IMAGENET1K_FBGEMM_V1",
         quantized=True,
     )

@@ -10,7 +10,11 @@ class TorchvisionModel:
     """Wrapping class for torchvision.models"""
 
     def __init__(
-        self, model_name: str, weights: str, weights_version: str = "DEFAULT", quantized: bool = False
+        self,
+        model_name: str,
+        weights: str,
+        weights_version: str = "DEFAULT",
+        quantized: bool = False,
     ) -> None:
         """Initialize the TorchvisionModel class
 
@@ -23,14 +27,18 @@ class TorchvisionModel:
             self.__weights = getattr(torchvision_quantized_models, weights)
         else:
             self.__weights = getattr(torchvision_models, weights)
-        
+
         self.__weights = getattr(self.__weights, weights_version)
 
         if quantized:
-            self.__model = getattr(torchvision_quantized_models, model_name)(weights=self.__weights, quantize=True)
+            self.__model = getattr(torchvision_quantized_models, model_name)(
+                weights=self.__weights, quantize=True
+            )
         else:
-            self.__model = getattr(torchvision_models, model_name)(weights=self.__weights)
-        
+            self.__model = getattr(torchvision_models, model_name)(
+                weights=self.__weights
+            )
+
         self.__model.eval()
 
         self.__preprocessing = self.__weights.transforms()

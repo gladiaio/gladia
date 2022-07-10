@@ -129,6 +129,9 @@ def cast_response(response, expected_output: dict):
     elif isinstance(response, list):
         return json.dumps(response, cls=NpEncoder, ensure_ascii=False).encode("utf8")
 
+    elif isinstance(response, dict):
+        return json.dumps(response, cls=NpEncoder, ensure_ascii=False).encode("utf8")
+
     elif isinstance(response, str):
         return __convert_string_response(response)
 

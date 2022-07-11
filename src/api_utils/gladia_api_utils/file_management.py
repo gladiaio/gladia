@@ -94,7 +94,7 @@ def write_to_file(file_full_path, data) -> bool:
     if isinstance(file_full_path, str):
         file_full_path = Path(file_full_path)
 
-    os.makedirs(os.path.dirname(file_full_path))
+    os.makedirs(os.path.dirname(file_full_path), exist_ok=True)
 
     if isinstance(data, io.BytesIO):
         with open(file_full_path, "wb") as handler:
@@ -102,6 +102,10 @@ def write_to_file(file_full_path, data) -> bool:
         handler.write(data)
     elif isinstance(data, Image.Image):
         data.save(file_full_path)
+    else:
+
+        with open(file_full_path, "wb") as handler:
+            handler.write(data)
 
 
 def generate_random_filename(upload_directory, extension):

@@ -8,7 +8,7 @@ This script start the Gladia server. It does mainly three things :
 
 # `main.py`
 
-Apart from performing some chore tasks, `main.py` will walk through the `gladia/src/apis/` direcrtory and look for all the routes to be added to the FASTAPI router object. 
+Apart from performing some chore tasks, `main.py` will walk through the `gladia/src/apis/` directory and look for all the routes to be added to the FASTAPI router object. 
 
 ## How will it do it ? 
 

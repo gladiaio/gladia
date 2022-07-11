@@ -46,6 +46,7 @@ def request_endpoint(url, path, header, params=False, files=False, max_retry=3):
             response = requests.post(
                 f"{url}{path}", headers=header, params=params, files=files
             )
+
         else:
             response = requests.post(f"{url}{path}", headers=header, params=params)
         print(f"|  |       ___ Try : {tries}/{max_retry}")
@@ -78,6 +79,28 @@ def perform_test(details, url, header, path, skip_when_failed, max_retry=3):
         if input == "image":
             params = (("model", model),)
             files = {"image": ("test.jpg", open("test.jpg", "rb"))}
+
+            response = request_endpoint(
+                url=url,
+                path=path,
+                header=header,
+                params=params,
+                files=files,
+                max_retry=max_retry,
+            )
+
+            if response.status_code == 200:
+                nb_test_passed += 1
+                status = status_passed
+
+            else:
+                nb_test_failed += 1
+                status = status_failed
+                test_final_status = ExitStatus_failure
+
+        elif input == "audio":
+            params = (("model", model),)
+            files = {"audio": ("test.mp3", open("test.mp3", "rb"))}
 
             response = request_endpoint(
                 url=url,

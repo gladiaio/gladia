@@ -103,7 +103,6 @@ def write_to_file(file_full_path, data) -> bool:
     elif isinstance(data, Image.Image):
         data.save(file_full_path)
     else:
-
         with open(file_full_path, "wb") as handler:
             handler.write(data)
 

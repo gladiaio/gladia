@@ -1,8 +1,6 @@
-from torchvision.io import read_image
-from torchvision.models import inception_v3, Inception_V3_Weights
-
-
 from gladia_api_utils.io import _open
+from torchvision.io import read_image
+from torchvision.models import Inception_V3_Weights, inception_v3
 
 
 def predict(image: bytes, top_k: int = 1) -> [str]:

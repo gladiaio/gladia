@@ -1,5 +1,5 @@
-from gladia_api_utils.TorchvisionModelHelper import TorchvisionModel
 from gladia_api_utils.io import _open
+from gladia_api_utils.TorchvisionModelHelper import TorchvisionModel
 
 
 def predict(image: bytes, top_k: int = 1) -> [str]:

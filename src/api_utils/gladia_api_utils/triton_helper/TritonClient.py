@@ -1,10 +1,11 @@
 import os
-import requests
-import tritonclient.http as tritonclient
-
 from time import sleep
 from typing import Any
 from warnings import warn
+
+import requests
+import tritonclient.http as tritonclient
+
 from .download_active_models import download_triton_model
 
 

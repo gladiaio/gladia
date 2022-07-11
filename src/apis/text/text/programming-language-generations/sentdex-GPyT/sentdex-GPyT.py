@@ -1,10 +1,9 @@
 import torch
-
 from transformers import (
-    AutoTokenizer,
     AutoModelWithLMHead,
-    PreTrainedTokenizer,
+    AutoTokenizer,
     PreTrainedModel,
+    PreTrainedTokenizer,
 )
 
 

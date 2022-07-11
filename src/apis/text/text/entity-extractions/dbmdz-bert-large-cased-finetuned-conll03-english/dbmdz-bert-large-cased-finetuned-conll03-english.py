@@ -1,8 +1,8 @@
 import os
-import numpy as np
 
-from transformers import AutoTokenizer
+import numpy as np
 from gladia_api_utils.triton_helper import TritonClient
+from transformers import AutoTokenizer
 
 
 def softmax(x: [float]) -> [float]:

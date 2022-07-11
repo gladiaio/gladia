@@ -1,6 +1,5 @@
 import torch
-
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
 
 def predict(context: str) -> [str]:

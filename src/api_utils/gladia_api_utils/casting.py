@@ -1,15 +1,16 @@
 import io
-import os
-import PIL
 import json
+import os
 import pathlib
-import numpy as np
-
 from warnings import warn
-from .file_management import get_file_type
-from fastapi.responses import JSONResponse
+
+import numpy as np
+import PIL
 from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 from starlette.responses import StreamingResponse
+
+from .file_management import get_file_type
 
 
 class NpEncoder(json.JSONEncoder):

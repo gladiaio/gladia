@@ -1,15 +1,16 @@
 import io
 from logging import raiseExceptions
+from pathlib import Path
 from typing import Any
 
+import cv2
 import magic
 import numpy as np
 import pandas as pd
 from icecream import ic
 from PIL import Image
-import cv2
+
 from .file_management import get_buffer_category, get_buffer_type, get_mime_category
-from pathlib import Path
 
 
 def _open(input, btype=None, options=dict()) -> Any:

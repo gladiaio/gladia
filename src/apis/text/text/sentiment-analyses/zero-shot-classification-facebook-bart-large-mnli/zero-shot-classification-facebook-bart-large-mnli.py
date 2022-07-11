@@ -1,6 +1,6 @@
 import json
-import numpy as np
 
+import numpy as np
 from transformers import pipeline
 
 

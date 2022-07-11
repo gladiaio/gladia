@@ -1,7 +1,7 @@
 import re
+
 import cv2
 import numpy as np
-
 from gladia_api_utils.io import _open
 
 

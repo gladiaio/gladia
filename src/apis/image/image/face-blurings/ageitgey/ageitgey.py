@@ -1,8 +1,7 @@
 import cv2
-
-from numpy import ndarray
-from gladia_api_utils.image_management import blur_image
 from gladia_api_utils.file_management import input_to_files
+from gladia_api_utils.image_management import blur_image
+from numpy import ndarray
 
 
 @input_to_files

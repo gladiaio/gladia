@@ -1,6 +1,5 @@
 import torch
-
-from transformers import AutoTokenizer, AutoModelForTokenClassification
+from transformers import AutoModelForTokenClassification, AutoTokenizer
 
 
 def predict(text: str) -> [(str, str)]:

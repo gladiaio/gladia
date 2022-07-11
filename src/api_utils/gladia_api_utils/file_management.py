@@ -1,20 +1,20 @@
 import io
 import os
-import sys
-import gdown
-import magic
-import string
 import random
-import requests
+import string
+import sys
 import tempfile
-
-from PIL import Image
-from uuid import uuid4
-from icecream import ic
 from pathlib import Path
 from urllib.parse import urlparse
-from xtract.utils import get_file_type
+from uuid import uuid4
+
+import gdown
+import magic
+import requests
+from icecream import ic
+from PIL import Image
 from xtract import XZ, BZip2, GZip, Rar, Tar, Zip, xtract
+from xtract.utils import get_file_type
 
 
 def write_tmp_file(content):

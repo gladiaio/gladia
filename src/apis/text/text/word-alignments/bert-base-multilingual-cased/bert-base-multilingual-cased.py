@@ -1,5 +1,6 @@
-import torch
 import itertools
+
+import torch
 import transformers
 
 

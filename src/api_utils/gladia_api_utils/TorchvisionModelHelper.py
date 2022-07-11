@@ -5,8 +5,6 @@ from torchvision import models as torchvision_models
 from torchvision.io import read_image
 from torchvision.models import quantization as torchvision_quantized_models
 
-from .io import _open
-
 
 class TorchvisionModel:
     """Wrapping class for torchvision.models"""

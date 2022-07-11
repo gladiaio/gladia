@@ -1,9 +1,9 @@
-from time import sleep
-import sys
 import os
+import sys
+from time import sleep
 
-import requests
 import click
+import requests
 
 global nb_total_tests
 global nb_test_ran, nb_test_passed, nb_test_failed, nb_test_skipped

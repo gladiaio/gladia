@@ -1,6 +1,5 @@
 import torch
-
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 
 def predict(text: str) -> str:

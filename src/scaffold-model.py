@@ -1,4 +1,5 @@
 import os
+from importlib.machinery import SourceFileLoader
 from pathlib import Path
 from pprint import pprint
 
@@ -6,8 +7,6 @@ import easyargs
 import inflect
 import inquirer
 from inquirer.themes import GreenPassion
-from importlib.machinery import SourceFileLoader
-
 
 p = inflect.engine()
 

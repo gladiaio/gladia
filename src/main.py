@@ -1,16 +1,17 @@
-import os
-import apis
+import importlib
 import json
 import logging
+import os
 import pkgutil
-import importlib
 
-from icecream import ic
 from fastapi import FastAPI
-from fastapi.responses import ORJSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import ORJSONResponse
 from fastapi_utils.timing import add_timing_middleware
+from icecream import ic
 from prometheus_fastapi_instrumentator import Instrumentator
+
+import apis
 
 
 def __init_config() -> dict:

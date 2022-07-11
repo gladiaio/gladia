@@ -1,8 +1,9 @@
 import os
-from skimage.filters import gaussian
-from PIL import Image
-import numpy as np
+
 import cv2
+import numpy as np
+from PIL import Image
+from skimage.filters import gaussian
 
 
 def compress_JPG_image(image, path_original, size=(1920, 1080)) -> str:

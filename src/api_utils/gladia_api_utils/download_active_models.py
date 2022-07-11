@@ -1,5 +1,5 @@
-import os
 import json
+import os
 
 
 def __filter_directories(directories: [str]) -> [str]:

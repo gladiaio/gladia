@@ -1,7 +1,8 @@
-import requests
 import json
-import click
 import sys
+
+import click
+import requests
 
 
 class bcolors:

@@ -7,6 +7,7 @@ from warnings import warn
 import numpy as np
 from PIL import Image, ExifTags
 from PIL.PngImagePlugin import PngInfo
+
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from starlette.responses import StreamingResponse

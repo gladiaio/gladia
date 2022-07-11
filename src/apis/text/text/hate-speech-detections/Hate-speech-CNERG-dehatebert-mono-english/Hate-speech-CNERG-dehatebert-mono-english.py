@@ -1,13 +1,15 @@
 import os
-import requests
-import numpy as np
-
-# import tritonclient.http as tritonclient
 
 # from time import sleep
 from warnings import warn
-from transformers import BertTokenizer
+
+import numpy as np
+import requests
 from gladia_api_utils.triton_helper import TritonClient
+from transformers import BertTokenizer
+
+# import tritonclient.http as tritonclient
+
 
 # from gladia_api_utils.triton_helper import download_triton_model
 

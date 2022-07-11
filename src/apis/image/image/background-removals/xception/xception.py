@@ -1,12 +1,11 @@
 import os
+
 import numpy as np
 import tensorflow.compat.v1 as tf
-
-from PIL import Image
-from gladia_api_utils.io import _open
 from gladia_api_utils.image_management import draw_segment
+from gladia_api_utils.io import _open
 from gladia_api_utils.model_management import download_models
-
+from PIL import Image
 
 sess = None
 

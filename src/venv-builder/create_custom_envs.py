@@ -1,12 +1,12 @@
-import os
-import yaml
 import argparse
-import tempfile
+import os
 import subprocess
+import tempfile
+from typing import List, Tuple
 
-from tqdm import tqdm
-from typing import Tuple, List
+import yaml
 from gladia_api_utils import get_activated_task_path
+from tqdm import tqdm
 
 
 def retrieve_package_from_env_file(env_file: dict) -> Tuple[List[str], List[str]]:

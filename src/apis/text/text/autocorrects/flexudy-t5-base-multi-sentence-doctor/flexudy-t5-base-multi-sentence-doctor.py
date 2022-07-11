@@ -1,4 +1,4 @@
-from transformers import AutoTokenizer, AutoModelWithLMHead
+from transformers import AutoModelWithLMHead, AutoTokenizer
 
 
 def predict(sentence: str) -> str:

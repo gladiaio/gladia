@@ -1,6 +1,6 @@
-from importlib_metadata import version
-from gladia_api_utils.TorchvisionModelHelper import TorchvisionModel
 from gladia_api_utils.io import _open
+from gladia_api_utils.TorchvisionModelHelper import TorchvisionModel
+from importlib_metadata import version
 
 
 def predict(image: bytes, top_k: int = 1) -> [str]:

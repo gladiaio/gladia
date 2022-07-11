@@ -1,8 +1,6 @@
-from torchvision.io import read_image
-from torchvision.models import mnasnet1_0, MNASNet1_0_Weights
-
-
 from gladia_api_utils.io import _open
+from torchvision.io import read_image
+from torchvision.models import MNASNet1_0_Weights, mnasnet1_0
 
 
 def predict(image: bytes, top_k: int = 1) -> [str]:

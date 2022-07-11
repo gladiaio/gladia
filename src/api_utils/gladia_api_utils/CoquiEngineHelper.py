@@ -35,12 +35,12 @@ class SpeechToTextEngine:
         )
 
         model_path = (
-            Path(models_path[f"{model_uri}/{model}"]["output_path"])
+            Path(models_path[f"{model_uri}/model"]["output_path"])
             .absolute()
             .as_posix()
         )
         scorer_path = (
-            Path(models_path[f"{model_uri}/{scorer}"]["output_path"])
+            Path(models_path[f"{model_uri}/scorer"]["output_path"])
             .absolute()
             .as_posix()
         )

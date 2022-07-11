@@ -190,7 +190,7 @@ class TaskRouter:
         input_list = list()
 
         if isinstance(input, str):
-            if input in ["image", "video", "sound"]:
+            if input in ["image", "video", "audio"]:
                 input_list.append(forge.arg(input, type=UploadFile, default=File(...)))
             elif input == "text":
                 input_list.append(forge.arg("text", type=str, default="default Text"))
@@ -208,7 +208,7 @@ class TaskRouter:
                 elif item["type"] in ["float", "decimal"]:
                     item["type"] = float
 
-                if item["type"] in ["image", "sound", "video"]:
+                if item["type"] in ["image", "audio", "video"]:
                     input_list.append(
                         forge.arg(item["name"], type=UploadFile, default=File(...))
                     )
@@ -269,6 +269,8 @@ class TaskRouter:
                     kwargs[key] = await value.read()
 
             model = kwargs["model"]
+            # avoid passing the model to the predict function
+            # therefor removing it from the kwargs
             del kwargs["model"]
 
             module_path = f"{self.root_package_path}/{model}/"

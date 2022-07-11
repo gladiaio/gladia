@@ -1,15 +1,17 @@
 import io
-import os
-import PIL
 import json
+import os
 import pathlib
-import numpy as np
-
 from warnings import warn
-from .file_management import get_file_type
-from fastapi.responses import JSONResponse
+
+import numpy as np
+from PIL import Image, ExifTags
+from PIL.PngImagePlugin import PngInfo
 from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 from starlette.responses import StreamingResponse
+
+from .file_management import get_file_type
 
 
 class NpEncoder(json.JSONEncoder):
@@ -24,13 +26,19 @@ class NpEncoder(json.JSONEncoder):
             return super(NpEncoder, self).default(obj)
 
 
-def __convert_pillow_image_response(response: PIL.Image.Image):
+def __convert_pillow_image_response(image_response: Image.Image, additional_metadata: dict = dict()):
     ioresult = io.BytesIO()
-
-    response.save(ioresult, format="png")
+    
+    image_response.save(ioresult, format="png")
+    
     ioresult.seek(0)
 
-    return StreamingResponse(ioresult, media_type="image/png")
+    returned_response = StreamingResponse(ioresult, media_type="image/png")
+
+    if len(additional_metadata) > 0:
+        returned_response.headers['gladia_metadata'] = json.dumps(additional_metadata)
+
+    return returned_response
 
 
 def __convert_ndarray_response(response: np.ndarray, output_type: str):
@@ -113,8 +121,15 @@ def cast_response(response, expected_output: dict):
     Returns:
         Any: Casted response
     """
+    
+    if isinstance(response, tuple):
+        if list(map(type, response)) == [Image.Image, dict]:
+            image, addition_exif = response
+            return __convert_pillow_image_response(image, addition_exif)
+        else:
+            return json.dumps(response, cls=NpEncoder, ensure_ascii=False).encode("utf8")
 
-    if isinstance(response, PIL.Image.Image):
+    if isinstance(response, Image.Image):
         return __convert_pillow_image_response(response)
 
     elif isinstance(response, np.ndarray):
@@ -127,6 +142,9 @@ def cast_response(response, expected_output: dict):
         return __convert_io_response(response, expected_output["type"])
 
     elif isinstance(response, list):
+        return json.dumps(response, cls=NpEncoder, ensure_ascii=False).encode("utf8")
+
+    elif isinstance(response, dict):
         return json.dumps(response, cls=NpEncoder, ensure_ascii=False).encode("utf8")
 
     elif isinstance(response, str):

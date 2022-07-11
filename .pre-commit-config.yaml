@@ -1,4 +1,14 @@
 repos:
+- repo: https://github.com/hadialqattan/pycln
+  rev: master
+  hooks:
+    - id: pycln
+      name: pycln
+      language_version: python3
+      description: "A formatter for finding and removing unused import statements."
+      entry: pycln
+      language: python
+      types: [python]
 - repo: https://github.com/psf/black
   rev: 22.6.0
   hooks:

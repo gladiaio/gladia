@@ -11,7 +11,6 @@ from icecream import ic
 class SpeechToTextEngine:
     def __init__(self, model_uri: str="english/coqui/v1.0.0-huge-vocab", model="model.tflite", scorer="scorer.scorer"):
 
-        model_uri="english/coqui/v1.0.0-huge-vocab"
         language, author, version = model_uri.split("/")
         
         model_url = f"https://coqui.gateway.scarf.sh/{model_uri}"

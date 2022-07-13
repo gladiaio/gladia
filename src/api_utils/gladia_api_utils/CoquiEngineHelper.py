@@ -1,3 +1,4 @@
+import os
 import wave
 from io import BytesIO
 from pathlib import Path
@@ -7,7 +8,7 @@ import numpy as np
 from gladia_api_utils.model_management import download_model
 from icecream import ic
 from stt import Model
-import os
+
 
 class SpeechToTextEngine:
     def __init__(
@@ -22,30 +23,18 @@ class SpeechToTextEngine:
         model_path_prefix = f"{os.getenv('MODEL_CACHE_ROOT')}/audio/text/{model_uri}"
 
         model_url = f"https://coqui.gateway.scarf.sh/{model_uri}"
-        
 
-        model_path=download_model(
-                    url=f"{model_url}/{model}",
-                    output_path=f"{model_path_prefix}/model"
-                )
-
-        scorer_path=download_model(
-                url=f"{model_url}/{scorer}",
-                output_path=f"{model_path_prefix}/scorer"
-                )
-
-        
-        model_path = (
-            Path(model_path)
-            .absolute()
-            .as_posix()
+        model_path = download_model(
+            url=f"{model_url}/{model}", output_path=f"{model_path_prefix}/model"
         )
 
-        scorer_path = (
-            Path(scorer_path)
-            .absolute()
-            .as_posix()
+        scorer_path = download_model(
+            url=f"{model_url}/{scorer}", output_path=f"{model_path_prefix}/scorer"
         )
+
+        model_path = Path(model_path).absolute().as_posix()
+
+        scorer_path = Path(scorer_path).absolute().as_posix()
 
         self.model = Model(model_path)
         self.model.enableExternalScorer(scorer_path)

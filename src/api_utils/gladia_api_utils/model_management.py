@@ -88,9 +88,7 @@ def download_models(model_list: dict) -> dict:
 
     # check env to see if mutualized_storage had been set
     mutualized_storage = os.getenv("MODEL_CACHE_ROOT", True)
-    mutualized_storage_root = os.getenv(
-        "MODEL_CACHE_ROOT", "/tmp/gladia/models/"
-    )
+    mutualized_storage_root = os.getenv("MODEL_CACHE_ROOT", "/tmp/gladia/models/")
 
     for key, model in model_list.items():
         if not os.path.isabs(model["output_path"]):

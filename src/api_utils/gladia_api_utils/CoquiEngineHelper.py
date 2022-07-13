@@ -1,6 +1,8 @@
 <<<<<<< HEAD
-from genericpath import exists
 from tkinter.tix import Tree
+
+from genericpath import exists
+
 =======
 >>>>>>> c28c1fa0fa967eff1da360944095fd0950e49059
 import wave
@@ -9,11 +11,14 @@ from pathlib import Path
 
 import ffmpeg
 import numpy as np
+
 <<<<<<< HEAD
+import os
+
 from gladia_api_utils.model_management import download_model
 from icecream import ic
 from stt import Model
-import os
+
 =======
 from gladia_api_utils.model_management import download_models
 from icecream import ic

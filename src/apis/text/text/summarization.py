@@ -1,5 +1,3 @@
-from typing import List
-
 from fastapi import APIRouter
 from gladia_api_utils.submodules import TaskRouter
 

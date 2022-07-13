@@ -1,12 +1,12 @@
 import os
 
-# from time import sleep
-from warnings import warn
-
 import numpy as np
 import requests
 from gladia_api_utils.triton_helper import TritonClient
 from transformers import BertTokenizer
+
+# from time import sleep
+
 
 # import tritonclient.http as tritonclient
 

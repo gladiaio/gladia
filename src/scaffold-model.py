@@ -1,7 +1,6 @@
 import os
 from importlib.machinery import SourceFileLoader
 from pathlib import Path
-from pprint import pprint
 
 import easyargs
 import inflect

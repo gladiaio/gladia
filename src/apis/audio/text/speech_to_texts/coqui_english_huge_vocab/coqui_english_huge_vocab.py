@@ -1,5 +1,3 @@
-from concurrent.futures import ThreadPoolExecutor
-
 from gladia_api_utils.CoquiEngineHelper import SpeechToTextEngine
 from gladia_api_utils.io import _open
 

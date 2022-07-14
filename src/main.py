@@ -199,9 +199,11 @@ logger = __init_logging(config)
 
 app = FastAPI(default_response_class=ORJSONResponse)
 
+
 @app.get("/", include_in_schema=False)
 async def docs_redirect():
-    return RedirectResponse(url='/docs')
+    return RedirectResponse(url="/docs")
+
 
 __set_app_middlewares(app, config)
 

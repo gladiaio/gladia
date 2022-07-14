@@ -90,21 +90,22 @@ def write_url_content_to_file(file_full_path: Path, url) -> bool:
     return write_to_file(file_full_path, data)
 
 
-def write_to_file(file_full_path, data) -> bool:
+def write_to_file(file_full_path, data, overwrite=False) -> bool:
     if isinstance(file_full_path, str):
         file_full_path = Path(file_full_path)
 
     os.makedirs(os.path.dirname(file_full_path), exist_ok=True)
 
-    if isinstance(data, io.BytesIO):
-        with open(file_full_path, "wb") as handler:
-            data = data.read()
-        handler.write(data)
-    elif isinstance(data, Image.Image):
-        data.save(file_full_path)
-    else:
-        with open(file_full_path, "wb") as handler:
+    if not os.path.exists(file_full_path) or overwrite:
+        if isinstance(data, io.BytesIO):
+            with open(file_full_path, "wb") as handler:
+                data = data.read()
             handler.write(data)
+        elif isinstance(data, Image.Image):
+            data.save(file_full_path)
+        else:
+            with open(file_full_path, "wb") as handler:
+                handler.write(data)
 
 
 def generate_random_filename(upload_directory, extension):

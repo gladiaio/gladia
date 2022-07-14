@@ -10,6 +10,7 @@ from fastapi.responses import ORJSONResponse
 from fastapi_utils.timing import add_timing_middleware
 from icecream import ic
 from prometheus_fastapi_instrumentator import Instrumentator
+from starlette.responses import RedirectResponse
 
 import apis
 
@@ -197,6 +198,10 @@ config = __init_config()
 logger = __init_logging(config)
 
 app = FastAPI(default_response_class=ORJSONResponse)
+
+@app.get("/", include_in_schema=False)
+async def docs_redirect():
+    return RedirectResponse(url='/docs')
 
 __set_app_middlewares(app, config)
 

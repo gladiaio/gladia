@@ -128,6 +128,37 @@ def get_model_versions(root_path=None) -> dict:
     return versions, package_path
 
 
+def exec_in_subprocess(
+    env_name: str,
+    module_path: str,
+    model: str,
+    output_tmp_result: str,
+):
+
+    HERE = pathlib.Path(__file__).parent
+
+    print(f"HELLLLLLLLLLLLLLLLLLO", file=sys.stderr)
+    print(f"{HERE=}", file=sys.stderr)
+    print(f"{str(HERE / 'run_process.py')}", file=sys.stderr)
+
+    # cmd = f"""micromamba run -n {env_name} python {str(HERE / 'run_process.py')}"""
+    cmd = f"""eval "$(micromamba shell hook --shell=bash)" && micromamba run -n {env_name} python {str(HERE / 'run_process.py')} {bla} {bla} {bla} {bla}"""
+    # cmd = f"ls"
+
+    try:
+        proc = subprocess.Popen(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE
+        )
+
+        output, error = proc.communicate()
+
+        print(f"{output=}", file=sys.stderr)
+        print(f"{error=}", file=sys.stderr)
+
+    except subprocess.CalledProcessError as error:
+        raise RuntimeError(f"Couldn't activate custom env {env_name}: {error}")
+
+
 def exec_in_custom_env(env_name: str, cmd: str):
     cmd = f"micromamba activate {env_name} && {cmd}"
 
@@ -333,7 +364,8 @@ EOF
 """
 
                 try:
-                    exec_in_custom_env(env_name=env_name, cmd=cmd)
+                    # exec_in_custom_env(env_name=env_name, cmd=cmd)
+                    exec_in_subprocess(env_name=env_name)
 
                 except Exception as e:
                     raise HTTPException(

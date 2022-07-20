@@ -143,7 +143,7 @@ def download_triton_model(triton_models_dir: str, git_path: str) -> None:
 
     subprocess.run(f"mv {os.path.join(clone_to_path, '*')} {triton_models_dir}", shell=True, check=True)
 
-    subprocess.run(f"rm -rf {clone_to_path}", shell=True, check=True)
+    os.remove(clone_to_path)
 
 
 def download_active_triton_models(

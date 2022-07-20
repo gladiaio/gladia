@@ -1,6 +1,8 @@
-import json
 import os
+import shutil
+import json
 import subprocess
+
 from time import time
 
 
@@ -140,11 +142,7 @@ def download_triton_model(triton_models_dir: str, git_path: str) -> None:
         f"cd {clone_to_path} && git lfs fetch && git lfs pull", shell=True, check=True
     )
 
-    subprocess.run(
-        f"mv {os.path.join(clone_to_path, '*')} {triton_models_dir}",
-        shell=True,
-        check=True,
-    )
+    shutil.move(os.path.join(clone_to_path, '*'), triton_models_dir)
 
     os.remove(clone_to_path)
 

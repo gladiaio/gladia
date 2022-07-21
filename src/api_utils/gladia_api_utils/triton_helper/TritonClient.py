@@ -13,7 +13,7 @@ class TritonClient:
     """Wrapper suggaring triton'client usage"""
 
     def __init__(
-        self, triton_server_url: str, model_name: str, current_path: str = ""
+        self, triton_server_url: str, model_name: str, current_path: str = "", **kwargs,
     ) -> None:
         """TritonClient's initializer
 
@@ -22,8 +22,10 @@ class TritonClient:
             model_name (str): name of the model to communicate with
             current_path (str, optional): current path (allows to download model if needed). Defaults to "".
         """
+
         self.__triton_server_url = triton_server_url
         self.__model_name = model_name
+        self.__model_sub_parts = kwargs.get("sub_parts", [])
 
         self.__client = tritonclient.InferenceServerClient(
             url=self.__triton_server_url, verbose=False
@@ -32,7 +34,7 @@ class TritonClient:
         self.__registered_inputs = []
 
         self.__registered_outputs = [
-            tritonclient.InferRequestedOutput(name=f"output__0")
+            tritonclient.InferRequestedOutput(name=kwargs.get("output_name", "output__0"))
         ]
 
         if os.getenv("TRITON_MODELS_PATH") == "":
@@ -46,7 +48,7 @@ class TritonClient:
     def client(self):
         return self.__client
 
-    def register_new_input(self, shape, datatype: str) -> None:
+    def register_new_input(self, shape, datatype: str, **kwargs) -> None:
         """Add a new input to the triton inferer. Each input has to be registered before usage.
 
         Args:
@@ -56,20 +58,20 @@ class TritonClient:
 
         self.__registered_inputs.append(
             tritonclient.InferInput(
-                name=f"input__{len(self.__registered_inputs)}",
+                name=kwargs.get("name", f"input__{len(self.__registered_inputs)}"),
                 shape=shape,
                 datatype=datatype,
             )
         )
 
-    def register_new_output(self) -> None:
+    def register_new_output(self, **kwargs) -> None:
         """Add a new output to the triton inferer. Each ouput has to be registered before usage.\n
         By default one ouput named `output__0` is already registered.
         """
 
         self.__registered_outputs.append(
             tritonclient.InferRequestedOutput(
-                name=f"ouput__{len(self.__registered_outputs)}"
+                name=kwargs.get("name", f"ouput__{len(self.__registered_outputs)}")
             )
         )
 
@@ -106,14 +108,20 @@ class TritonClient:
         Returns:
             [Any]: List of outputs from the model
         """
-        del kwds
 
         for arg, registered_input in zip(args, self.__registered_inputs):
             registered_input.set_data_from_numpy(arg)
 
-        requests.post(
-            url=f"http://{self.__triton_server_url}/v2/repository/models/{self.__model_name}/load"
-        )
+        if kwds.get("force_load", True):
+
+            for model_sub_part in self.__model_sub_parts:
+                response = requests.post(
+                    url=f"http://{self.__triton_server_url}/v2/repository/models/{model_sub_part}/load",
+                )
+
+            requests.post(
+                url=f"http://{self.__triton_server_url}/v2/repository/models/{self.__model_name}/load"
+            )
 
         model_response = self.client.infer(
             self.__model_name,
@@ -122,10 +130,17 @@ class TritonClient:
             outputs=self.__registered_outputs,
         )
 
-        response = requests.post(
-            url=f"http://{self.__triton_server_url}/v2/repository/models/{self.__model_name}/unload",
-            data={"unload_dependents": True},
-        )
+        if kwds.get("force_unload", True):
+
+            response = requests.post(
+                url=f"http://{self.__triton_server_url}/v2/repository/models/{self.__model_name}/unload",
+                data={"unload_dependents": False},
+            )
+
+            for model_sub_part in self.__model_sub_parts:
+                response = requests.post(
+                    url=f"http://{self.__triton_server_url}/v2/repository/models/{model_sub_part}/unload",
+                )
 
         if response.status_code != 200:
             warn(f"{self.__model_name} has not been properly unloaded.")

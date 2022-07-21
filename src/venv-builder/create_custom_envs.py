@@ -1,5 +1,6 @@
 import argparse
 import os
+import re
 import subprocess
 import tempfile
 from typing import List, Tuple
@@ -105,6 +106,10 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
             f"micromamba create -f {temporary_file.name  + '.yaml'} -y".split(" "),
             check=True,
         )
+        subprocess.run(
+            f"micromamba clean --all --yes".split(" "),
+            check=True,
+        )
 
     except subprocess.CalledProcessError as error:
         raise RuntimeError(f"Couldn't create env {env_name}: {error}")
@@ -146,12 +151,15 @@ def build_specific_envs(paths: List[str]) -> None:
         )
 
 
-def build_env_for_activated_tasks(path_to_config_file: str, path_to_apis: str) -> None:
+def build_env_for_activated_tasks(
+    path_to_config_file: str, path_to_apis: str, modality=".*"
+) -> None:
     """Build the mamba env for every activated tasks
 
     Arguments:
         path_to_config_file {str} -- Path to the general config file describing which tasks is activated
         path_to_apis {str} -- Path to the Gladia's tasks
+        modality {str} -- modality name pattern filter
     """
 
     paths = get_activated_task_path(
@@ -159,7 +167,13 @@ def build_env_for_activated_tasks(path_to_config_file: str, path_to_apis: str) -
     )
 
     for task in tqdm(paths):
+        print(task)
 
+        if not bool(re.search(modality[0], task)):
+            print("skip")
+            continue
+
+        print("process")
         if os.path.exists(os.path.join(task, "env.yaml")):
             create_custom_env(
                 env_name=os.path.split(task)[1],
@@ -192,14 +206,21 @@ def main():
         type=str,
         help="Specify the name of a specific env to build. You can define this arg multiple time to build multiple specific envs.",
     )
-
+    parser.add_argument(
+        "--modality",
+        action="append",
+        type=str,
+        help="Specify a RegExp to filter input nd output modalities to process. default .*",
+    )
     args = parser.parse_args()
 
     if args.name:
         return build_specific_envs(args.name)
 
     return build_env_for_activated_tasks(
-        path_to_config_file="../config.json", path_to_apis="../apis"
+        path_to_config_file="../config.json",
+        path_to_apis="../apis",
+        modality=args.modality,
     )
 
 

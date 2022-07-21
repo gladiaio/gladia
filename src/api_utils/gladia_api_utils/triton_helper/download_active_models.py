@@ -1,6 +1,8 @@
 import json
 import os
+import shutil
 import subprocess
+from time import time
 
 
 def __filter_directories(directories: [str]) -> [str]:
@@ -130,17 +132,24 @@ def download_triton_model(triton_models_dir: str, git_path: str) -> None:
         return
 
     git_url = open(git_path).read()
-    model_name = git_url.split("/")[-1]
 
-    clone_to_path = os.path.join(triton_models_dir, model_name)
-
-    if os.path.exists(clone_to_path):
-        return
+    clone_to_path = os.path.join("/tmp/", str(time()))
 
     subprocess.run(f"git clone {git_url} {clone_to_path}", shell=True, check=True)
+
     subprocess.run(
         f"cd {clone_to_path} && git lfs fetch && git lfs pull", shell=True, check=True
     )
+
+    already_downloaded_models = os.listdir(triton_models_dir)
+
+    for filename in os.listdir(clone_to_path):
+        if filename[0] == "." or filename in already_downloaded_models:
+            continue
+
+        shutil.move(os.path.join(clone_to_path, filename), triton_models_dir)
+
+    shutil.rmtree(clone_to_path)
 
 
 def download_active_triton_models(

@@ -1,6 +1,6 @@
 import os
-import shutil
 import json
+import shutil
 import subprocess
 
 from time import time

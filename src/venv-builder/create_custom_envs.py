@@ -1,8 +1,8 @@
 import argparse
 import os
+import re
 import subprocess
 import tempfile
-import re
 from typing import List, Tuple
 
 import yaml
@@ -107,7 +107,7 @@ def create_custom_env(env_name: str, path_to_env_file: str) -> None:
             check=True,
         )
         subprocess.run(
-            f"micromamba clean --all --yes".split(" "), 
+            f"micromamba clean --all --yes".split(" "),
             check=True,
         )
 
@@ -151,7 +151,9 @@ def build_specific_envs(paths: List[str]) -> None:
         )
 
 
-def build_env_for_activated_tasks(path_to_config_file: str, path_to_apis: str, modality=".*") -> None:
+def build_env_for_activated_tasks(
+    path_to_config_file: str, path_to_apis: str, modality=".*"
+) -> None:
     """Build the mamba env for every activated tasks
 
     Arguments:
@@ -163,7 +165,7 @@ def build_env_for_activated_tasks(path_to_config_file: str, path_to_apis: str, m
     paths = get_activated_task_path(
         path_to_config_file=path_to_config_file, path_to_apis=path_to_apis
     )
-    
+
     for task in tqdm(paths):
         print(task)
 
@@ -216,10 +218,11 @@ def main():
         return build_specific_envs(args.name)
 
     return build_env_for_activated_tasks(
-        path_to_config_file="../config.json", path_to_apis="../apis", modality=args.modality
+        path_to_config_file="../config.json",
+        path_to_apis="../apis",
+        modality=args.modality,
     )
 
 
 if __name__ == "__main__":
     main()
-

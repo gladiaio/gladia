@@ -1,6 +1,6 @@
 import os
-import shutil
 import json
+import shutil
 import subprocess
 
 from time import time
@@ -142,9 +142,15 @@ def download_triton_model(triton_models_dir: str, git_path: str) -> None:
         f"cd {clone_to_path} && git lfs fetch && git lfs pull", shell=True, check=True
     )
 
-    shutil.move(os.path.join(clone_to_path, '*'), triton_models_dir)
+    already_downloaded_models = os.listdir(triton_models_dir)
 
-    os.remove(clone_to_path)
+    for filename in os.listdir(clone_to_path):
+        if filename[0] == "." or filename in already_downloaded_models:
+            continue
+
+        shutil.move(os.path.join(clone_to_path, filename), triton_models_dir)
+
+    shutil.rmtree(clone_to_path)
 
 
 def download_active_triton_models(

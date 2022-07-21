@@ -11,6 +11,7 @@ services:
     volumes:
       - /tmp/gladia/:/tmp/gladia/
     container_name: gladia
+    shm_size: '5gb'
     deploy:
       resources:
         reservations:

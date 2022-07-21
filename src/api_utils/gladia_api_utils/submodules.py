@@ -1,4 +1,5 @@
 import importlib
+import json
 import os
 import pathlib
 import re
@@ -7,7 +8,7 @@ import sys
 import tempfile
 import warnings
 from pathlib import Path
-from shlex import quote
+from shlex import quote, split
 
 import forge
 import inflect
@@ -129,10 +130,7 @@ def get_model_versions(root_path=None) -> dict:
 
 
 def exec_in_subprocess(
-    env_name: str,
-    module_path: str,
-    model: str,
-    output_tmp_result: str,
+    env_name: str, module_path: str, model: str, output_tmp_result: str, **kwargs
 ):
 
     HERE = pathlib.Path(__file__).parent
@@ -142,12 +140,30 @@ def exec_in_subprocess(
     print(f"{str(HERE / 'run_process.py')}", file=sys.stderr)
 
     # cmd = f"""micromamba run -n {env_name} python {str(HERE / 'run_process.py')}"""
-    cmd = f"""eval "$(micromamba shell hook --shell=bash)" && micromamba run -n {env_name} python {str(HERE / 'run_process.py')} {bla} {bla} {bla} {bla}"""
-    # cmd = f"ls"
+    print(f"{kwargs=}", file=sys.stderr)
+    # ckwargs = ""
+    # for key, value in kwargs.items():
+    #     ckwargs += f"{key}={value} "
+    cmd = f"""micromamba run -n {env_name} python {str(HERE / 'run_process.py')} {module_path} {model} {output_tmp_result} """
+    tmp = f"{quote(json.dumps(kwargs))}"
+    print("tmp= " + tmp, file=sys.stderr)
+    cmd += tmp
+    print("cmd= " + cmd, file=sys.stderr)
+    cmd2 = r"{}".format(cmd)
+    print("cmd= " + cmd, file=sys.stderr)
+    print(cmd2, file=sys.stderr)
+    print(split(cmd2), file=sys.stderr)
+    # print(cmd.replace('"', '\\"'), file=sys.stderr)
+    # cmd = cmd.replace('"', '\\"')
 
     try:
         proc = subprocess.Popen(
-            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE
+            cmd2,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            stdin=subprocess.PIPE,
+            shell=True,
+            executable="/bin/bash",
         )
 
         output, error = proc.communicate()
@@ -164,6 +180,7 @@ def exec_in_custom_env(env_name: str, cmd: str):
 
     try:
         full_cmd = f"""eval "$(micromamba shell hook --shell=bash)" && {cmd}"""
+        print(f"{full_cmd=}", file=sys.stderr)
 
         process = subprocess.Popen(
             full_cmd,
@@ -365,7 +382,13 @@ EOF
 
                 try:
                     # exec_in_custom_env(env_name=env_name, cmd=cmd)
-                    exec_in_subprocess(env_name=env_name)
+                    exec_in_subprocess(
+                        env_name=env_name,
+                        module_path=module_path,
+                        model=model,
+                        output_tmp_result=output_tmp_result,
+                        **kwargs,
+                    )
 
                 except Exception as e:
                     raise HTTPException(

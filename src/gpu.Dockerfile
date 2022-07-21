@@ -14,6 +14,7 @@ ARG PATH_TO_GLADIA_SRC="/app/"
 ARG DOCKER_USER=root
 ARG DOCKER_GROUP=root
 ARG API_SERVER_PORT_HTTP=8080
+ARG MAMBA_ALWAYS_SOFTLINK="true"
 
 ENV GLADIA_TMP_PATH=$GLADIA_TMP_PATH \
     MODEL_CACHE_ROOT="$GLADIA_TMP_PATH/models"
@@ -90,6 +91,7 @@ RUN mkdir -p $TRITON_MODELS_PATH && \
     wget -qO- "https://micro.mamba.pm/api/micromamba/linux-64/latest" | tar -xvj bin/micromamba && \
     mv bin/micromamba /usr/local/bin/micromamba && \ 
     micromamba shell init -s bash && \
+    micromamba config set always_softlink $MAMBA_ALWAYS_SOFTLINK && \
     apt-get clean autoclean && \
     apt-get autoremove --yes && \
     rm -rf /var/lib/apt/lists/*

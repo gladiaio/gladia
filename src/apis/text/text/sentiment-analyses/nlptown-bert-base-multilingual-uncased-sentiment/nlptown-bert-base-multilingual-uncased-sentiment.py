@@ -1,7 +1,6 @@
 import os
-import json
-import numpy as np
 
+import numpy as np
 from gladia_api_utils.triton_helper import TritonClient
 
 
@@ -13,7 +12,7 @@ def predict(text: str) -> str:
     :return: text score [1;5]
     """
 
-    TRITON_SERVER_URL = os.getenv("TRITON_SERVER_URL", default='localhost:8000')
+    TRITON_SERVER_URL = os.getenv("TRITON_SERVER_URL", default="localhost:8000")
     MODEL_NAME = "sentiment-analyses_nlptown_bert-base-multilingual-uncased-sentiment_tensorrt_inference"
     MODEL_SUB_PARTS = [
         "sentiment-analyses_nlptown_bert-base-multilingual-uncased-sentiment_tensorrt_model",
@@ -25,18 +24,16 @@ def predict(text: str) -> str:
         MODEL_NAME,
         current_path=os.path.split(__file__)[0],
         sub_parts=MODEL_SUB_PARTS,
-        output_name="output"
+        output_name="output",
     )
 
-    in0 = np.array([text.encode('utf-8')])
+    in0 = np.array([text.encode("utf-8")])
     in0 = np.expand_dims(in0, axis=0)
-    in0n = np.array([str(x).encode('utf-8') for x in in0.reshape(in0.size)], dtype=np.object_)
-
-    client.register_new_input(
-        name="TEXT",
-        shape=in0n.shape,
-        datatype='BYTES'
+    in0n = np.array(
+        [str(x).encode("utf-8") for x in in0.reshape(in0.size)], dtype=np.object_
     )
+
+    client.register_new_input(name="TEXT", shape=in0n.shape, datatype="BYTES")
 
     output = client(in0n)[0]
 

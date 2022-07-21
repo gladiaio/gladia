@@ -13,7 +13,11 @@ class TritonClient:
     """Wrapper suggaring triton'client usage"""
 
     def __init__(
-        self, triton_server_url: str, model_name: str, current_path: str = "", **kwargs,
+        self,
+        triton_server_url: str,
+        model_name: str,
+        current_path: str = "",
+        **kwargs,
     ) -> None:
         """TritonClient's initializer
 
@@ -34,7 +38,9 @@ class TritonClient:
         self.__registered_inputs = []
 
         self.__registered_outputs = [
-            tritonclient.InferRequestedOutput(name=kwargs.get("output_name", "output__0"))
+            tritonclient.InferRequestedOutput(
+                name=kwargs.get("output_name", "output__0")
+            )
         ]
 
         if os.getenv("TRITON_MODELS_PATH") == "":

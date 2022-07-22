@@ -31,7 +31,7 @@ class TritonClient:
             "triton_server_url",
             os.getenv("TRITON_SERVER_URL", default="localhost:8000"),
         )
-        
+
         self.__current_path = kwargs.get(
             "current_path",
             str(pathlib.Path( sys._getframe(1).f_globals["file"]).absolute())
@@ -57,7 +57,7 @@ class TritonClient:
                 "[DEBUG] TRITON_MODELS_PATH is not set, please specify it in order to be able to download models."
             )
 
-        self.__download_model(os.path.join(current_path, ".git_path"))
+        self.__download_model(os.path.join(self.__current_path, ".git_path"))
 
     @property
     def client(self):

@@ -6,9 +6,10 @@ import re
 import subprocess
 import sys
 import tempfile
+import urllib.parse
 import warnings
 from pathlib import Path
-from shlex import quote, split
+from shlex import quote
 
 import forge
 import inflect
@@ -135,30 +136,12 @@ def exec_in_subprocess(
 
     HERE = pathlib.Path(__file__).parent
 
-    print(f"HELLLLLLLLLLLLLLLLLLO", file=sys.stderr)
-    print(f"{HERE=}", file=sys.stderr)
-    print(f"{str(HERE / 'run_process.py')}", file=sys.stderr)
-
-    # cmd = f"""micromamba run -n {env_name} python {str(HERE / 'run_process.py')}"""
-    print(f"{kwargs=}", file=sys.stderr)
-    # ckwargs = ""
-    # for key, value in kwargs.items():
-    #     ckwargs += f"{key}={value} "
     cmd = f"""micromamba run -n {env_name} python {str(HERE / 'run_process.py')} {module_path} {model} {output_tmp_result} """
-    tmp = f"{quote(json.dumps(kwargs))}"
-    print("tmp= " + tmp, file=sys.stderr)
-    cmd += tmp
-    print("cmd= " + cmd, file=sys.stderr)
-    cmd2 = r"{}".format(cmd)
-    print("cmd= " + cmd, file=sys.stderr)
-    print(cmd2, file=sys.stderr)
-    print(split(cmd2), file=sys.stderr)
-    # print(cmd.replace('"', '\\"'), file=sys.stderr)
-    # cmd = cmd.replace('"', '\\"')
+    cmd += f"{quote(urllib.parse.quote(json.dumps(kwargs)))}"
 
     try:
         proc = subprocess.Popen(
-            cmd2,
+            cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             stdin=subprocess.PIPE,
@@ -167,31 +150,6 @@ def exec_in_subprocess(
         )
 
         output, error = proc.communicate()
-
-        print(f"{output=}", file=sys.stderr)
-        print(f"{error=}", file=sys.stderr)
-
-    except subprocess.CalledProcessError as error:
-        raise RuntimeError(f"Couldn't activate custom env {env_name}: {error}")
-
-
-def exec_in_custom_env(env_name: str, cmd: str):
-    cmd = f"micromamba activate {env_name} && {cmd}"
-
-    try:
-        full_cmd = f"""eval "$(micromamba shell hook --shell=bash)" && {cmd}"""
-        print(f"{full_cmd=}", file=sys.stderr)
-
-        process = subprocess.Popen(
-            full_cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            shell=True,
-            executable="/bin/bash",
-        )
-        output, error = process.communicate()
-
-        print("[error]:", error)
 
     except subprocess.CalledProcessError as error:
         raise RuntimeError(f"Couldn't activate custom env {env_name}: {error}")
@@ -355,33 +313,7 @@ class TaskRouter:
                 model = quote(model)
                 output_tmp_result = quote(output_tmp_result)
 
-                cmd = f"""
-python - <<-EOF
-
-import os
-import importlib.util
-
-from PIL import Image
-
-os.environ['LD_LIBRARY_PATH'] = '/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/opt/conda/lib'
-
-spec = importlib.util.spec_from_file_location('{PATH_TO_GLADIA_SRC}/{module_path}', '{PATH_TO_GLADIA_SRC}/{module_path}/{model}.py')
-this_module = importlib.util.module_from_spec(spec)
-
-spec.loader.exec_module(this_module)
-
-output = this_module.predict(**{kwargs})
-
-if isinstance(output, Image.Image):
-    output.save('{output_tmp_result}', format='PNG')
-else:
-    with open('{output_tmp_result}', 'w') as f:
-        f.write(str(output))
-EOF
-"""
-
                 try:
-                    # exec_in_custom_env(env_name=env_name, cmd=cmd)
                     exec_in_subprocess(
                         env_name=env_name,
                         module_path=module_path,

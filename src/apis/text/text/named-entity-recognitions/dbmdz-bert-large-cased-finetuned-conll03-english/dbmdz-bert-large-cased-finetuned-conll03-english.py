@@ -1,17 +1,8 @@
-<<<<<<< HEAD
-import os
 import json
-
+import os
 from typing import List
+
 from gladia_api_utils.triton_helper import TritonClient, data_processing
-=======
-import json
-import os
-from typing import List
-
-import numpy as np
-from gladia_api_utils.triton_helper import TritonClient
->>>>>>> 2b962ec2294b4ab31e397658ae742b04172b2393
 
 
 def predict(text: str) -> List[dict]:
@@ -49,6 +40,6 @@ def predict(text: str) -> List[dict]:
 
     client.register_new_input(name="TEXT", shape=np_output.shape, datatype="BYTES")
 
-    output = client(np_output)[0].decode('utf8')
+    output = client(np_output)[0].decode("utf8")
 
     return json.loads(output)[0]

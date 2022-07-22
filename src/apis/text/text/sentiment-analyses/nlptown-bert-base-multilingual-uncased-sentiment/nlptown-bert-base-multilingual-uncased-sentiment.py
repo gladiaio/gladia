@@ -12,7 +12,6 @@ def predict(text: str) -> str:
     :return: text score [1;5]
     """
 
-    TRITON_SERVER_URL = os.getenv("TRITON_SERVER_URL", default="localhost:8000")
     MODEL_NAME = "sentiment-analyses_nlptown_bert-base-multilingual-uncased-sentiment_tensorrt_inference"
     MODEL_SUB_PARTS = [
         "sentiment-analyses_nlptown_bert-base-multilingual-uncased-sentiment_tensorrt_model",
@@ -20,8 +19,7 @@ def predict(text: str) -> str:
     ]
 
     client = TritonClient(
-        TRITON_SERVER_URL,
-        MODEL_NAME,
+        model_name=MODEL_NAME,
         current_path=os.path.split(__file__)[0],
         sub_parts=MODEL_SUB_PARTS,
         output_name="output",

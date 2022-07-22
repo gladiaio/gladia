@@ -39,10 +39,9 @@ def predict(input_string: str) -> [dict]:
     ]
     MODEL_NAME = "ner_bert-large-cased-finetuned-conll03-english_base_traced"
     TOKENIZER_NAME = "dbmdz/bert-large-cased-finetuned-conll03-english"
-    TRITON_SEVER_URL = os.getenv("TRITON_SERVER_URL", default="localhost:8000")
 
     client = TritonClient(
-        TRITON_SEVER_URL, MODEL_NAME, current_path=os.path.split(__file__)[0]
+        model_name=MODEL_NAME, current_path=os.path.split(__file__)[0]
     )
 
     tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_NAME)

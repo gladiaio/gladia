@@ -25,10 +25,9 @@ def predict(text: str) -> str:
     LABELS = ["hate-speech", "normal", "offensive"]
     MODEL_NAME = "hate-speech-detection_bert-base-uncased-hatexplain_base_traced"
     TOKENIZER_NAME = "Hate-speech-CNERG/bert-base-uncased-hatexplain"
-    TRITON_SEVER_URL = os.getenv("TRITON_SERVER_URL", default="localhost:8000")
 
     client = TritonClient(
-        TRITON_SEVER_URL, MODEL_NAME, current_path=os.path.split(__file__)[0]
+        model_name=MODEL_NAME, current_path=os.path.split(__file__)[0]
     )
 
     tokenizer = BertTokenizer.from_pretrained(TOKENIZER_NAME)

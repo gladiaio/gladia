@@ -2,6 +2,7 @@ import importlib.util
 import json
 import os
 import sys
+import urllib.parse
 
 from PIL import Image
 
@@ -10,13 +11,7 @@ if __name__ == "__main__":
     module_path = sys.argv[1]
     model = sys.argv[2]
     output_tmp_result = sys.argv[3]
-    print(sys.argv[4], file=sys.stderr)
-    kwargs = json.loads(sys.argv[4])
-
-    print(f"{module_path=}", file=sys.stderr)
-    print(f"{model=}", file=sys.stderr)
-    print(f"{kwargs=}", file=sys.stderr)
-    print(f"{output_tmp_result=}", file=sys.stderr)
+    kwargs = json.loads(urllib.parse.unquote(sys.argv[4]))
 
     PATH_TO_GLADIA_SRC = os.getenv("PATH_TO_GLADIA_SRC", "/app")
 

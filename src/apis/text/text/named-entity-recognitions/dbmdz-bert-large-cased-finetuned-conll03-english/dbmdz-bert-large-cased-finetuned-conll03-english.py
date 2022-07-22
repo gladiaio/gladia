@@ -1,8 +1,17 @@
+<<<<<<< HEAD
 import os
 import json
 
 from typing import List
 from gladia_api_utils.triton_helper import TritonClient, data_processing
+=======
+import json
+import os
+from typing import List
+
+import numpy as np
+from gladia_api_utils.triton_helper import TritonClient
+>>>>>>> 2b962ec2294b4ab31e397658ae742b04172b2393
 
 
 def predict(text: str) -> List[dict]:

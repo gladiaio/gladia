@@ -40,6 +40,6 @@ def predict(text: str) -> List[dict]:
 
     client.register_new_input(name="TEXT", shape=np_output.shape, datatype="BYTES")
 
-    output = client(np_output)[0].decode('utf8')
+    output = client(np_output)[0].decode("utf8")
 
     return json.loads(output)[0]

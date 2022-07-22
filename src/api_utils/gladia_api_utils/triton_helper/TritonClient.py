@@ -26,7 +26,10 @@ class TritonClient:
             current_path (str, optional): current path (allows to download model if needed). Defaults to "".
         """
 
-        self.__triton_server_url = kwargs.get("triton_server_url", os.getenv("TRITON_SERVER_URL", default="localhost:8000"))
+        self.__triton_server_url = kwargs.get(
+            "triton_server_url",
+            os.getenv("TRITON_SERVER_URL", default="localhost:8000"),
+        )
         self.__model_name = model_name
         self.__model_sub_parts = kwargs.get("sub_parts", [])
 

@@ -151,6 +151,8 @@ def exec_in_subprocess(
 
         output, error = proc.communicate()
 
+        print("[error]:", error)
+
     except subprocess.CalledProcessError as error:
         raise RuntimeError(f"Couldn't activate custom env {env_name}: {error}")
 

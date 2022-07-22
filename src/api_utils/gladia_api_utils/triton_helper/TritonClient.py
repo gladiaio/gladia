@@ -34,7 +34,7 @@ class TritonClient:
 
         self.__current_path = kwargs.get(
             "current_path",
-            str(pathlib.Path( sys._getframe(1).f_globals["file"]).absolute())
+            str(pathlib.Path(sys._getframe(1).f_globals["file"]).absolute()),
         )
 
         self.__model_name = model_name

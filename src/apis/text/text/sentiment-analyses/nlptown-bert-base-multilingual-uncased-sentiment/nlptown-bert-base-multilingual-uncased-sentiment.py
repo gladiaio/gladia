@@ -1,5 +1,7 @@
-import torch
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
+import os
+
+import numpy as np
+from gladia_api_utils.triton_helper import TritonClient
 
 
 def predict(text: str) -> str:
@@ -10,14 +12,27 @@ def predict(text: str) -> str:
     :return: text score [1;5]
     """
 
-    model_name = "nlptown/bert-base-multilingual-uncased-sentiment"
+    MODEL_NAME = "sentiment-analyses_nlptown_bert-base-multilingual-uncased-sentiment_tensorrt_inference"
+    MODEL_SUB_PARTS = [
+        "sentiment-analyses_nlptown_bert-base-multilingual-uncased-sentiment_tensorrt_model",
+        "sentiment-analyses_nlptown_bert-base-multilingual-uncased-sentiment_tensorrt_tokenize",
+    ]
 
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForSequenceClassification.from_pretrained(model_name)
+    client = TritonClient(
+        model_name=MODEL_NAME,
+        current_path=os.path.split(__file__)[0],
+        sub_parts=MODEL_SUB_PARTS,
+        output_name="output",
+    )
 
-    input_ids = tokenizer.encode_plus(text, return_tensors="pt")
+    in0 = np.array([text.encode("utf-8")])
+    in0 = np.expand_dims(in0, axis=0)
+    in0n = np.array(
+        [str(x).encode("utf-8") for x in in0.reshape(in0.size)], dtype=np.object_
+    )
 
-    sequence_classifier = model(**input_ids)
-    predicted_idx = torch.argmax(sequence_classifier[0], dim=1)
+    client.register_new_input(name="TEXT", shape=in0n.shape, datatype="BYTES")
 
-    return str(predicted_idx.item() + 1)
+    output = client(in0n)[0]
+
+    return output.argmax()

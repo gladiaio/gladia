@@ -74,7 +74,7 @@ Help us build the biggest treasure trove of State of the Arts AI models, one we 
 # Quickstart
 ## Magic Start
 ```sh
-docker run -d -p 8080:8080 gladiaio/gladia:latest
+docker run -d --shm-size=5g -p 8080:8080 gladiaio/gladia:latest
 ```
 Access the service through [http://localhost:8080/docs](http://localhost:8080/docs) or [http://localhost:8080/redoc](http://localhost:8080/redoc) or whatever public/private IP of the server you are running on
 

@@ -1,4 +1,4 @@
-def predict(text: str) -> str:
+def predict(text: str) -> dict:
     """
     For a given text, predict if it's POSITIVE or NEGATIVE
 

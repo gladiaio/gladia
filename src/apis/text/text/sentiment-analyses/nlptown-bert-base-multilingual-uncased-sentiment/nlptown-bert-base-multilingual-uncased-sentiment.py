@@ -1,6 +1,6 @@
 import os
 
-from gladia_api_utils.triton_helper import TritonClient, data_preprocessing
+from gladia_api_utils.triton_helper import TritonClient, data_processing
 
 
 def predict(text: str) -> str:

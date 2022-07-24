@@ -4,7 +4,7 @@ import numpy as np
 from transformers import pipeline
 
 
-def predict(text: str) -> str:
+def predict(text: str) -> dict:
     """
     For a given text, predict if it's POSITIVE, NEUTRAL or NEGATIVE
 

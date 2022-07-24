@@ -16,9 +16,8 @@ def predict(text: str) -> str:
     )
     result = happy_tc.classify_text(text)
 
-    return json.dumps(
-        {
+    return {
             "label": "POSITIVE" if result.label == "LABEL_0" else "NEGATIVE",
-            "score": result.score,
-        }
-    )
+            "score": result.score
+            }
+    

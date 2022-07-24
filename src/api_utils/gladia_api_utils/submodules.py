@@ -237,7 +237,7 @@ class TaskRouter:
         response_classes = {
             "image": ImageResponse,
             "video": VideoResponse,
-            "audio": AudioResponse,
+            "audio": AudioResponse
         }
 
         response_class = response_classes.get(self.output["type"], JSONResponse)
@@ -361,7 +361,7 @@ EOF
                     model, f"{self.root_package_path}/{model}/{model}.py"
                 ).load_module()
 
-                # C'est ici qu'il lance le process sans venv
+                # This is where we launch the inference without custom env
                 result = getattr(this_module, f"predict")(*args, **kwargs)
             try:
                 return cast_response(result, self.output)

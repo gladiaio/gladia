@@ -18,4 +18,4 @@ def predict(text: str) -> str:
     label = prediction["labels"][np.argmax(prediction["scores"])]
     score = np.amax(prediction["scores"])
 
-    return json.dumps({"label": label, "score": score})
+    return {"label": label, "score": score}

@@ -3,6 +3,9 @@ import json
 import os
 import pathlib
 from warnings import warn
+import re
+import ast
+
 
 import numpy as np
 from fastapi.encoders import jsonable_encoder
@@ -22,6 +25,8 @@ class NpEncoder(json.JSONEncoder):
             return float(obj)
         elif isinstance(obj, np.ndarray):
             return obj.tolist()
+        elif isinstance(obj, bytes):
+            return obj.decode('utf-8')
         else:
             return super(NpEncoder, self).default(obj)
 
@@ -91,26 +96,36 @@ def __convert_io_response(response: io.IOBase, output_type: str):
 
 
 def __convert_string_response(response: str):
+    # if response is a string but not a file path
+    # try to load it as a json representation
+    # else return it as is
     if not os.path.exists(response):
-        return response
-
-    try:
-        if pathlib.Path(response).is_file():
-            file_to_stream = open(response, "rb")
-
-            out = StreamingResponse(file_to_stream, media_type=get_file_type(response))
-
-            os.remove(response)
-
-            return out
-
-        else:
+        try:
+            response = ast.literal_eval(response)
+            return json.loads(response)
+        except:
             return response
+    
+    # if the string looks like a filepath
+    # try to load it as a json 
+    # else try to stream it
+    else:
+        try:
+            if pathlib.Path(response).is_file():
+                try:
+                    return json.load(response)
+                except:
+                    file_to_stream = open(response, "rb")
+                    return StreamingResponse(file_to_stream, media_type=get_file_type(response))
+                finally:
+                    os.remove(response)
+            else:
+                return response
 
-    except OSError as os_error:
-        warn(f"Couldn't interpret stream: {os_error}")
+        except OSError as os_error:
+            warn(f"Couldn't interpret stream: {os_error}")
 
-        return response
+            return response
 
 
 def cast_response(response, expected_output: dict):
@@ -129,9 +144,7 @@ def cast_response(response, expected_output: dict):
             image, addition_exif = response
             return __convert_pillow_image_response(image, addition_exif)
         else:
-            return json.dumps(response, cls=NpEncoder, ensure_ascii=False).encode(
-                "utf8"
-            )
+            return json.loads(json.dumps(response, cls=NpEncoder, ensure_ascii=False))
 
     if isinstance(response, Image.Image):
         return __convert_pillow_image_response(response)
@@ -146,10 +159,10 @@ def cast_response(response, expected_output: dict):
         return __convert_io_response(response, expected_output["type"])
 
     elif isinstance(response, list):
-        return json.dumps(response, cls=NpEncoder, ensure_ascii=False).encode("utf8")
+        return json.loads(json.dumps(response, cls=NpEncoder, ensure_ascii=False).encode("utf8"))
 
     elif isinstance(response, dict):
-        return json.dumps(response, cls=NpEncoder, ensure_ascii=False).encode("utf8")
+        return json.loads(json.dumps(response, cls=NpEncoder, ensure_ascii=False).encode("utf8"))
 
     elif isinstance(response, str):
         return __convert_string_response(response)

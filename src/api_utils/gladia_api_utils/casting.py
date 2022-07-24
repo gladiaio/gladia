@@ -169,10 +169,7 @@ def cast_response(response, expected_output: dict):
     elif isinstance(response, io.IOBase):
         return __convert_io_response(response, expected_output["type"])
 
-    elif isinstance(response, list):
-        return json.loads(json.dumps(response, cls=NpEncoder, ensure_ascii=False).encode("utf8"))
-
-    elif isinstance(response, dict):
+    elif isinstance(response, list) or isinstance(response, dict):
         return json.loads(json.dumps(response, cls=NpEncoder, ensure_ascii=False).encode("utf8"))
 
     elif isinstance(response, str):

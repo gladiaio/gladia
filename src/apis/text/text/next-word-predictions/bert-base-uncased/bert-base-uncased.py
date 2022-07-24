@@ -1,4 +1,4 @@
-def predict(sentence: str) -> str:
+def predict(sentence: str) -> dict:
     """
     For a given sentence, predict the next word.
 

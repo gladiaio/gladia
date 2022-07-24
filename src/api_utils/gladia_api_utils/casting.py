@@ -115,7 +115,8 @@ def __convert_string_response(response: str):
         except:
             try:
                 return {"prediction": str(response)}
-            except:
+            except Exception as e:
+                warn(f"Couldn't interpret response returning plain response: {e}")
                 return response
     
     # if the string looks like a filepath
@@ -126,7 +127,7 @@ def __convert_string_response(response: str):
             if pathlib.Path(response).is_file():
                 try:
                     return json.load(response)
-                except:
+                except Exception as e:
                     file_to_stream = open(response, "rb")
                     return StreamingResponse(file_to_stream, media_type=get_file_type(response))
                 finally:

@@ -2,10 +2,8 @@ import io
 import json
 import os
 import pathlib
-from warnings import warn
-
 import re
-
+from warnings import warn
 
 import numpy as np
 from fastapi.encoders import jsonable_encoder
@@ -26,7 +24,7 @@ class NpEncoder(json.JSONEncoder):
         elif isinstance(obj, np.ndarray):
             return obj.tolist()
         elif isinstance(obj, bytes):
-            return obj.decode('utf-8')
+            return obj.decode("utf-8")
         else:
             return super(NpEncoder, self).default(obj)
 
@@ -105,12 +103,12 @@ def __convert_string_response(response: str):
             # for security reason.
             # having regex doesn't interpret while
             # ast.literal_eval will
-            # see this proposition: 
+            # see this proposition:
             # https://stackoverflow.com/questions/39491420/python-jsonexpecting-property-name-enclosed-in-double-quotes
             # which I found very risky
             # J.L
-            p = re.compile('(?<!\\\\)\'')
-            this_response = p.sub('\"', response)
+            p = re.compile("(?<!\\\\)'")
+            this_response = p.sub('"', response)
             return json.loads(this_response)
         except:
             try:
@@ -118,9 +116,9 @@ def __convert_string_response(response: str):
             except Exception as e:
                 warn(f"Couldn't interpret response returning plain response: {e}")
                 return response
-    
+
     # if the string looks like a filepath
-    # try to load it as a json 
+    # try to load it as a json
     # else try to stream it
     else:
         try:
@@ -129,7 +127,9 @@ def __convert_string_response(response: str):
                     return json.load(response)
                 except Exception as e:
                     file_to_stream = open(response, "rb")
-                    return StreamingResponse(file_to_stream, media_type=get_file_type(response))
+                    return StreamingResponse(
+                        file_to_stream, media_type=get_file_type(response)
+                    )
                 finally:
                     os.remove(response)
             else:
@@ -171,7 +171,9 @@ def cast_response(response, expected_output: dict):
         return __convert_io_response(response, expected_output["type"])
 
     elif isinstance(response, list) or isinstance(response, dict):
-        return json.loads(json.dumps(response, cls=NpEncoder, ensure_ascii=False).encode("utf8"))
+        return json.loads(
+            json.dumps(response, cls=NpEncoder, ensure_ascii=False).encode("utf8")
+        )
 
     elif isinstance(response, str):
         return __convert_string_response(response)

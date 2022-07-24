@@ -237,7 +237,7 @@ class TaskRouter:
         response_classes = {
             "image": ImageResponse,
             "video": VideoResponse,
-            "audio": AudioResponse
+            "audio": AudioResponse,
         }
 
         response_class = response_classes.get(self.output["type"], JSONResponse)

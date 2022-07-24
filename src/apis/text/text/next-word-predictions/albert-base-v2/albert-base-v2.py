@@ -14,4 +14,4 @@ def predict(sentence: str) -> str:
 
     del happy_wp
 
-    return result[0].token
+    return {"prediction": result[0].token, "score": result[0].score}

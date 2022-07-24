@@ -3,8 +3,8 @@ import json
 import os
 import pathlib
 from warnings import warn
+
 import re
-import ast
 
 
 import numpy as np
@@ -101,10 +101,22 @@ def __convert_string_response(response: str):
     # else return it as is
     if not os.path.exists(response):
         try:
-            response = ast.literal_eval(response)
-            return json.loads(response)
+            # I decided to use regex instead of ast.literal_eval
+            # for security reason.
+            # having regex doesn't interpret while
+            # ast.literal_eval will
+            # see this proposition: 
+            # https://stackoverflow.com/questions/39491420/python-jsonexpecting-property-name-enclosed-in-double-quotes
+            # which I found very risky
+            # J.L
+            p = re.compile('(?<!\\\\)\'')
+            this_response = p.sub('\"', response)
+            return json.loads(this_response)
         except:
-            return response
+            try:
+                return {"prediction": str(response)}
+            except:
+                return response
     
     # if the string looks like a filepath
     # try to load it as a json 
@@ -124,7 +136,6 @@ def __convert_string_response(response: str):
 
         except OSError as os_error:
             warn(f"Couldn't interpret stream: {os_error}")
-
             return response
 
 

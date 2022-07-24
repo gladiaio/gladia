@@ -12,4 +12,4 @@ def predict(sentence: str) -> str:
 
     result = happy_wp.predict_mask(f"{sentence} [MASK]")
 
-    return result[0].token
+    return {"prediction": result[0].token, "score": result[0].score}

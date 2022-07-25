@@ -1,6 +1,6 @@
 import os
 
-from gladia_api_utils.triton_helper import TritonClient, data_preprocessing
+from gladia_api_utils.triton_helper import TritonClient, data_processing
 
 
 def predict(text: str) -> str:
@@ -24,7 +24,7 @@ def predict(text: str) -> str:
         output_name="output",
     )
 
-    numpy_input = data_preprocessing.text_to_numpy(text)
+    numpy_input = data_processing.text_to_numpy(text)
 
     client.register_new_input(name="TEXT", shape=numpy_input.shape, datatype="BYTES")
 

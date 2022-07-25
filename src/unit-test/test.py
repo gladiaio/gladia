@@ -60,7 +60,9 @@ def request_endpoint(url, path, header, params=False, files=False, max_retry=3):
     return response
 
 
-def perform_test(details, url, header, path, skip_when_failed, max_retry=3, specific_models=[]):
+def perform_test(
+    details, url, header, path, skip_when_failed, max_retry=3, specific_models=[]
+):
     global nb_test_ran, nb_test_passed, nb_test_failed, nb_test_skipped
     global test_final_status
     global status_passed, status_failed, status_skipped
@@ -283,22 +285,19 @@ def main(
     endpoints = response.json()
 
     # if the specific endpoint is less
-    # then 4 it means it's looking to 
+    # then 4 it means it's looking to
     # have a input or input/output mod
-    # this should also help to handle 
+    # this should also help to handle
     # missing trailing /
-    these_specific_endpoints=[]
+    these_specific_endpoints = []
     for specific_endpoint in specific_endpoints:
         if len(specific_endpoint.split("/")) < 4:
             for endpoint in endpoints["paths"].keys():
                 if endpoint.startswith(specific_endpoint):
                     these_specific_endpoints.append(endpoint)
-    
+
     if these_specific_endpoints != []:
         specific_endpoints = list(dict.fromkeys(these_specific_endpoints))
-
-
-
 
     print()
     print(f"Testing endpoints")
@@ -311,18 +310,27 @@ def main(
     nb_test_passed = 0
     nb_test_failed = 0
     nb_test_ran = 0
-    nb_total_tests = get_nb_tests(url, header, endpoints, specific_endpoints, specific_models)
+    nb_total_tests = get_nb_tests(
+        url, header, endpoints, specific_endpoints, specific_models
+    )
 
     after_endpoint_continue = False
     test_final_status = ExitStatus_success
-
 
     for path, details in endpoints["paths"].items():
         print(f"|__ {path}")
         print(f"|  |")
         if specific_endpoints:
             if path in specific_endpoints:
-                perform_test(details, url, header, path, skip_when_failed, max_retry, specific_models)
+                perform_test(
+                    details,
+                    url,
+                    header,
+                    path,
+                    skip_when_failed,
+                    max_retry,
+                    specific_models,
+                )
 
             elif after_endpoint != "":
                 if path in after_endpoint:

@@ -1,4 +1,6 @@
 import os
+import pathlib
+import sys
 from time import sleep
 from typing import Any
 from warnings import warn
@@ -15,7 +17,6 @@ class TritonClient:
     def __init__(
         self,
         model_name: str,
-        current_path: str = "",
         **kwargs,
     ) -> None:
         """TritonClient's initializer
@@ -30,6 +31,16 @@ class TritonClient:
             "triton_server_url",
             os.getenv("TRITON_SERVER_URL", default="localhost:8000"),
         )
+
+        self.__current_path = kwargs.get(
+            "current_path",
+            str(
+                pathlib.Path(sys._getframe(1).f_globals["__file__"])
+                .parents[0]
+                .absolute()
+            ),
+        )
+
         self.__model_name = model_name
         self.__model_sub_parts = kwargs.get("sub_parts", [])
 
@@ -50,7 +61,7 @@ class TritonClient:
                 "[DEBUG] TRITON_MODELS_PATH is not set, please specify it in order to be able to download models."
             )
 
-        self.__download_model(os.path.join(current_path, ".git_path"))
+        self.__download_model(os.path.join(self.__current_path, ".git_path"))
 
     @property
     def client(self):

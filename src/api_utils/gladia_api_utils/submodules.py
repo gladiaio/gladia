@@ -350,9 +350,10 @@ class TaskRouter:
                     model, f"{self.root_package_path}/{model}/{model}.py"
                 ).load_module()
 
-                # C'est ici qu'il lance le process sans venv
+                # This is where we launch the inference without custom env
                 result = getattr(this_module, f"predict")(*args, **kwargs)
             try:
+
                 return cast_response(result, self.output)
             except Exception as e:
                 print(e)
@@ -361,6 +362,7 @@ class TaskRouter:
                     detail=f"The following error occurred: {str(e)}",
                 )
             finally:
+
                 if isinstance(result, str):
                     try:
                         if (

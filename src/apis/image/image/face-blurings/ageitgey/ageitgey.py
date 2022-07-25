@@ -1,11 +1,12 @@
-import cv2
+from io import BytesIO
+
 from gladia_api_utils.file_management import input_to_files
 from gladia_api_utils.image_management import blur_image
-from numpy import ndarray
+from gladia_api_utils.io import np_to_img_buffer
 
 
 @input_to_files
-def predict(image: bytes) -> ndarray:
+def predict(image: bytes) -> BytesIO:
     """
     Call the model returning the image with the faces blured
 
@@ -27,9 +28,4 @@ def predict(image: bytes) -> ndarray:
 
         image = blur_image(image, startX, endX, startY, endY, sigma=sigma)
 
-    is_successful, im_png = cv2.imencode(".png", image)
-
-    if is_successful:
-        return im_png
-
-    raise Exception("Error encoding image")
+    return np_to_img_buffer(image)

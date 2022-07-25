@@ -150,7 +150,6 @@ def cast_response(response, expected_output: dict):
     Returns:
         Any: Casted response
     """
-
     if isinstance(response, tuple):
         if list(map(type, response)) == [Image.Image, dict]:
             image, addition_exif = response
@@ -164,13 +163,12 @@ def cast_response(response, expected_output: dict):
     elif isinstance(response, np.ndarray):
         return __convert_ndarray_response(response, expected_output["type"])
 
-    elif isinstance(response, bytes):
+    elif isinstance(response, (bytes, bytearray)):
         return __convert_bytes_response(response, expected_output["type"])
 
     elif isinstance(response, io.IOBase):
         return __convert_io_response(response, expected_output["type"])
-
-    elif isinstance(response, list) or isinstance(response, dict):
+    elif isinstance(response, (list, dict)):
         return json.loads(
             json.dumps(response, cls=NpEncoder, ensure_ascii=False).encode("utf8")
         )

@@ -165,6 +165,6 @@ class TritonClient:
             warn(f"{self.__model_name} has not been properly unloaded.")
 
         return [
-            model_response.as_numpy(output.name())[0]
+            model_response.as_numpy(output.name()).tolist()
             for output in self.__registered_outputs
         ]

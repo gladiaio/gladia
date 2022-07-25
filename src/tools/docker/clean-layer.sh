@@ -11,19 +11,28 @@ set -e
 set -x
 
 # Delete files that pip caches when installing a package.
-rm -rf /root/.cache/pip/*
+rm -rf /root/.cache/*
+rm -rf /tmp/pip*
+rm -rf /tmp/yarn*
+rm -rf /tmp/npm*
+rm -rf /tmp/tmp*
+rm -rf /tmp/mambaf*
+rm -rf /tmp/git*
+rm -rf /tmp/*.md
+
 # Delete old downloaded archive files 
-apt-get autoremove -y
+apt-get autoremove --purge -y
 # Delete downloaded archive files
-apt-get clean
+apt-get clean autoclean
 # Ensures the current working directory won't be deleted
 cd /usr/local/src/
 # Delete source files used for building binaries
 rm -rf /usr/local/src/*
-# Delete conda downloaded tarballs
-"$MINICONDA_INSTALL_PATH"/bin/conda clean -y --tarballs
+rm -rf /var/lib/apt/lists/*
 
-"$MINICONDA_INSTALL_PATH"/bin/conda clean -afy
-find "$MINICONDA_INSTALL_PATH" -follow -type f -name '*.a' -delete
-find "$MINICONDA_INSTALL_PATH" -follow -type f -name '*.pyc' -delete
-find "$MINICONDA_INSTALL_PATH" -follow -type f -name '*.js.map' -delete
+# Cleanup micromamba
+find "$MAMBA_ROOT_PREFIX" -follow -type f -name '*.a' -delete
+find "$MAMBA_ROOT_PREFIX" -follow -type f -name '*.pyc' -delete
+find "$MAMBA_ROOT_PREFIX" -follow -type f -name '*.js.map' -delete
+
+micromamba clean --all --yes

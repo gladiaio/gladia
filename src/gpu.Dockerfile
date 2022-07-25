@@ -53,9 +53,12 @@ RUN mkdir -p $TRITON_MODELS_PATH && \
     mkdir -p $PYTORCH_PRETRAINED_BERT_CACHE && \
     mkdir -p $NLTK_DATA && \
     mkdir -p $TRITON_MODELS_PATH && \
-    mkdir -p $PATH_TO_GLADIA_SRC && \
-    # Update apt repositories - Add Nvidia GPG key
-    apt-key del 7fa2af80 && \
+    mkdir -p $PATH_TO_GLADIA_SRC
+
+COPY . $PATH_TO_GLADIA_SRC
+
+# Update apt repositories - Add Nvidia GPG key
+RUN apt-key del 7fa2af80 && \
     apt-get install -y apt-transport-https && \
     wget https://developer.download.nvidia.com/compute/cuda/repos/$distro/$arch/cuda-keyring_1.0-1_all.deb && \
     dpkg -i cuda-keyring_1.0-1_all.deb && \
@@ -92,14 +95,10 @@ RUN mkdir -p $TRITON_MODELS_PATH && \
     mv bin/micromamba /usr/local/bin/micromamba && \ 
     micromamba shell init -s bash && \
     micromamba config set always_softlink $MAMBA_ALWAYS_SOFTLINK && \
-    apt-get clean autoclean && \
-    apt-get autoremove --yes && \
-    rm -rf /var/lib/apt/lists/*
-
-COPY . $PATH_TO_GLADIA_SRC
+    $PATH_TO_GLADIA_SRC/tools/docker/clean-layer.sh
 
 # Script which launches commands passed to "docker run"
-COPY _activate_current_env.sh /usr/local/bin/
+COPY  $PATH_TO_GLADIA_SRC/tools/docker/_activate_current_env.sh /usr/local/bin/
 
 # Automatically activate micromaba for every bash shell
 RUN echo "source /usr/local/bin/_activate_current_env.sh" >> ~/.bashrc && \
@@ -109,42 +108,53 @@ RUN echo "source /usr/local/bin/_activate_current_env.sh" >> ~/.bashrc && \
 WORKDIR $PATH_TO_GLADIA_SRC
 
 RUN micromamba create -f env.yaml && \
-    micromamba clean --all --yes
+    $PATH_TO_GLADIA_SRC/tools/docker/clean-layer.sh
 
-RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then micromamba run -n server /bin/bash -c "cd venv-builder/ && python3 create_custom_envs.py --modality '.*/apis/text/[a-zA-Z ]+/[a-rA-R].*'"; fi
-RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then micromamba run -n server /bin/bash -c "cd venv-builder/ && python3 create_custom_envs.py --modality '.*/apis/text/[a-zA-Z ]+/[s-zS-Z].*'"; fi
+RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then \
+        micromamba run -n server /bin/bash -c "cd $PATH_TO_GLADIA_SRC/tools/docker/venv-builder/ && python3 create_custom_envs.py --modality '.*/apis/text/[a-zA-Z ]+/[a-rA-R].*'" \
+    fi  && \
+    $PATH_TO_GLADIA_SRC/tools/clean-layer.sh
 
-RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then micromamba run -n server /bin/bash -c "cd venv-builder/ && python3 create_custom_envs.py --modality '.*/apis/video/.*'"; fi
+RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then \
+        micromamba run -n server /bin/bash -c "cd $PATH_TO_GLADIA_SRC/tools/docker/venv-builder/ && python3 create_custom_envs.py --modality '.*/apis/text/[a-zA-Z ]+/[s-zS-Z].*'" \
+    fi  && \
+    $PATH_TO_GLADIA_SRC/tools/docker/clean-layer.sh
 
-RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then micromamba run -n server /bin/bash -c "cd venv-builder/ && python3 create_custom_envs.py --modality '.*/apis/image/[a-zA-Z ]+/[a-hA-H].*'"; fi
-RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then micromamba run -n server /bin/bash -c "cd venv-builder/ && python3 create_custom_envs.py --modality '.*/apis/image/[a-zA-Z ]+/[i-zI-Z].*'"; fi
+RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then \
+        micromamba run -n server /bin/bash -c "cd $PATH_TO_GLADIA_SRC/tools/docker/venv-builder/ && python3 create_custom_envs.py --modality '.*/apis/video/.*'" \
+    fi  && \
+    $PATH_TO_GLADIA_SRC/tools/docker/clean-layer.sh
 
-RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then micromamba run -n server /bin/bash -c "cd venv-builder/ && python3 create_custom_envs.py --modality '.*/apis/audio/.*'"; fi
+RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then \
+        micromamba run -n server /bin/bash -c "cd $PATH_TO_GLADIA_SRC/tools/docker/venv-builder/ && python3 create_custom_envs.py --modality '.*/apis/image/[a-zA-Z ]+/[a-hA-H].*'" \
+    fi && \
+    $PATH_TO_GLADIA_SRC/tools/docker/clean-layer.sh
+
+RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then \
+        micromamba run -n server /bin/bash -c "cd $PATH_TO_GLADIA_SRC/tools/docker/venv-builder/ && python3 create_custom_envs.py --modality '.*/apis/image/[a-zA-Z ]+/[i-zI-Z].*'" \
+    fi && \
+    $PATH_TO_GLADIA_SRC/tools/docker/clean-layer.sh
+
+RUN if [ "$SKIP_CUSTOM_ENV_BUILD" = "false" ]; then \
+        micromamba run -n server /bin/bash -c "cd $PATH_TO_GLADIA_SRC/tools/docker/venv-builder/ && python3 create_custom_envs.py --modality '.*/apis/audio/.*'" \ 
+    fi && \
+    $PATH_TO_GLADIA_SRC/tools/docker/clean-layer.sh
 
 ENV LD_PRELOAD="/opt/tritonserver/backends/pytorch/libmkl_rt.so" \
     LD_LIBRARY_PATH="/opt/conda/envs/server/lib/":$MAMBA_ROOT_PREFIX"/envs/server/lib/"
-   
 
-# post install scripts
-# RUN echo "== CLEANING cache ==" && \ 
-#     if [ "$SKIP_ROOT_CACHE_CLEANING" = "false" ]; then [ -d "/root/.cache/" ] && rm -rf "/root/.cache/*"; fi && \
-#     if [ "$SKIP_PIP_CACHE_CLEANING" = "false" ]; then rm -rf "/tmp/pip*"; fi && \
-#     if [ "$SKIP_YARN_CACHE_CLEANING" = "false" ]; then rm -rf "/tmp/yarn*"; fi && \
-#     if [ "$SKIP_NPM_CACHE_CLEANING" = "false" ]; then rm -rf "/tmp/npm*"; fi && \
-#     if [ "$SKIP_TMPFILES_CACHE_CLEANING" = "false" ]; then rm -rf "/tmp/tmp*"; fi && \
-#     apt-get clean && \
-#     apt-get autoremove --purge && \
 RUN echo "== ADJUSTING binaries ==" && \ 
     mv /usr/bin/python3 /usr/bin/python38 && \
     ln -sf /usr/bin/python /usr/bin/python3 && \
     echo "== ADJUSTING entrypoint ==" && \ 
-    mv /app/entrypoint.sh /opt/nvidia/nvidia_entrypoint.sh && \
+    mv $PATH_TO_GLADIA_SRC/tools/docker/entrypoint.sh /opt/nvidia/nvidia_entrypoint.sh && \
     echo "== ADJUSTING path rights ==" && \ 
     chown -R $DOCKER_USER:$DOCKER_GROUP $PATH_TO_GLADIA_SRC && \
     chown -R $DOCKER_USER:$DOCKER_GROUP $GLADIA_TMP_PATH && \
     echo "== FIXING libcurl references ==" && \ 
     rm $MAMBA_ROOT_PREFIX/envs/server/lib/libcurl.so.4 && \
-    ln -s /usr/lib/x86_64-linux-gnu/libcurl.so.4.6.0 $MAMBA_ROOT_PREFIX/envs/server/lib/libcurl.so.4
+    ln -s /usr/lib/x86_64-linux-gnu/libcurl.so.4.6.0 $MAMBA_ROOT_PREFIX/envs/server/lib/libcurl.so.4 && \
+    $PATH_TO_GLADIA_SRC/tools/docker/clean-layer.sh
 
 EXPOSE $API_SERVER_PORT_HTTP
 

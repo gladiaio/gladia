@@ -19,12 +19,15 @@ ExitStatus_failure = 1
 ExitStatus_success = 0
 
 
-def get_nb_tests(url, header, endpoints, specific_endpoints):
+def get_nb_tests(url, header, endpoints, specific_endpoints=[], specific_models=""):
     nb_total_tests = 0
     for path, details in endpoints["paths"].items():
         if specific_endpoints:
             if path in specific_endpoints:
-                nb_total_tests += get_nb_models(url, path, header)
+                if specific_models:
+                    nb_total_tests += len(specific_models)
+                else:
+                    nb_total_tests += get_nb_models(url, path, header)
         else:
             nb_total_tests += get_nb_models(url, path, header)
 
@@ -57,7 +60,9 @@ def request_endpoint(url, path, header, params=False, files=False, max_retry=3):
     return response
 
 
-def perform_test(details, url, header, path, skip_when_failed, max_retry=3):
+def perform_test(
+    details, url, header, path, skip_when_failed, max_retry=3, specific_models=[]
+):
     global nb_test_ran, nb_test_passed, nb_test_failed, nb_test_skipped
     global test_final_status
     global status_passed, status_failed, status_skipped
@@ -66,8 +71,11 @@ def perform_test(details, url, header, path, skip_when_failed, max_retry=3):
 
     tag = details["get"]["tags"][0]
 
-    response = requests.get(f"{url}{path}", headers=header)
-    models = response.json()
+    if specific_models != []:
+        models = specific_models
+    else:
+        response = requests.get(f"{url}{path}", headers=header)
+        models = response.json()
 
     for model in models:
         if IS_CI:
@@ -197,6 +205,13 @@ def write_github_comment(github_token, github_pull_request, output):
     help="CSV separated list of specific endpoints/routes to test format is /input/output/singular_format_task/",
 )
 @click.option(
+    "-m",
+    "--specific_models",
+    type=str,
+    default="",
+    help="CSV separated list of specific models to test format is model1,model2",
+)
+@click.option(
     "-c",
     "--continue_when_failed",
     type=bool,
@@ -246,6 +261,7 @@ def main(
     url,
     bearer_token,
     specific_endpoints,
+    specific_models,
     continue_when_failed,
     after_endpoint,
     max_retry,
@@ -259,9 +275,29 @@ def main(
     else:
         specific_endpoints = []
 
+    if specific_models:
+        specific_models = specific_models.split(",")
+    else:
+        specific_models = []
+
     header = {"Authorization": "Bearer " + bearer_token}
     response = requests.get(f"{url}/openapi.json", headers=header)
     endpoints = response.json()
+
+    # if the specific endpoint is less
+    # then 4 it means it's looking to
+    # have a input or input/output mod
+    # this should also help to handle
+    # missing trailing /
+    these_specific_endpoints = []
+    for specific_endpoint in specific_endpoints:
+        if len(specific_endpoint.split("/")) < 4:
+            for endpoint in endpoints["paths"].keys():
+                if endpoint.startswith(specific_endpoint):
+                    these_specific_endpoints.append(endpoint)
+
+    if these_specific_endpoints != []:
+        specific_endpoints = list(dict.fromkeys(these_specific_endpoints))
 
     print()
     print(f"Testing endpoints")
@@ -274,16 +310,27 @@ def main(
     nb_test_passed = 0
     nb_test_failed = 0
     nb_test_ran = 0
-    nb_total_tests = get_nb_tests(url, header, endpoints, specific_endpoints)
+    nb_total_tests = get_nb_tests(
+        url, header, endpoints, specific_endpoints, specific_models
+    )
 
     after_endpoint_continue = False
     test_final_status = ExitStatus_success
+
     for path, details in endpoints["paths"].items():
         print(f"|__ {path}")
         print(f"|  |")
         if specific_endpoints:
             if path in specific_endpoints:
-                perform_test(details, url, header, path, skip_when_failed, max_retry)
+                perform_test(
+                    details,
+                    url,
+                    header,
+                    path,
+                    skip_when_failed,
+                    max_retry,
+                    specific_models,
+                )
 
             elif after_endpoint != "":
                 if path in after_endpoint:

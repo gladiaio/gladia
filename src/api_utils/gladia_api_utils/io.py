@@ -64,6 +64,7 @@ def to_pil(buffer):
     data = to_numpy(buffer)
     return Image.fromarray(np.uint8(data))
 
+
 def np_to_img_buffer(data, format="PNG"):
     buf = io.BytesIO()
     img = Image.fromarray(np.uint8(data))

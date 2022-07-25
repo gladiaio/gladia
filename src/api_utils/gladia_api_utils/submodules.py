@@ -136,7 +136,7 @@ def exec_in_subprocess(
 
     HERE = pathlib.Path(__file__).parent
 
-    cmd = f"""micromamba run -n {env_name} python {str(HERE / 'run_process.py')} {module_path} {model} {output_tmp_result} """
+    cmd = f"""micromamba run -n {env_name} python {os.path.join(HERE, 'run_process.py')} {module_path} {model} {output_tmp_result} """
     cmd += f"{quote(urllib.parse.quote(json.dumps(kwargs)))}"
 
     try:

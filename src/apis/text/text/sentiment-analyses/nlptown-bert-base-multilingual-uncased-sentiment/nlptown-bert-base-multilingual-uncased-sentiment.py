@@ -1,7 +1,6 @@
 import os
 
-import numpy as np
-from gladia_api_utils.triton_helper import TritonClient
+from gladia_api_utils.triton_helper import TritonClient, data_processing
 
 
 def predict(text: str) -> str:
@@ -25,14 +24,10 @@ def predict(text: str) -> str:
         output_name="output",
     )
 
-    in0 = np.array([text.encode("utf-8")])
-    in0 = np.expand_dims(in0, axis=0)
-    in0n = np.array(
-        [str(x).encode("utf-8") for x in in0.reshape(in0.size)], dtype=np.object_
-    )
+    numpy_input = data_processing.text_to_numpy(text)
 
-    client.register_new_input(name="TEXT", shape=in0n.shape, datatype="BYTES")
+    client.register_new_input(name="TEXT", shape=numpy_input.shape, datatype="BYTES")
 
-    output = client(in0n)[0]
+    output = client(numpy_input)[0][0]
 
-    return output.argmax()
+    return output.index(max(output))

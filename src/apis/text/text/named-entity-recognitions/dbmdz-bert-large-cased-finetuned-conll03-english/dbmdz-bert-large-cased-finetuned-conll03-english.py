@@ -2,7 +2,7 @@ import json
 import os
 from typing import List
 
-from gladia_api_utils.triton_helper import TritonClient, text_to_numpy
+from gladia_api_utils.triton_helper import TritonClient, data_processing
 
 
 def predict(text: str) -> List[dict]:
@@ -36,7 +36,7 @@ def predict(text: str) -> List[dict]:
         output_name="output",
     )
 
-    np_output = text_to_numpy(text)
+    np_output = data_processing.text_to_numpy(text)
 
     client.register_new_input(name="TEXT", shape=np_output.shape, datatype="BYTES")
 

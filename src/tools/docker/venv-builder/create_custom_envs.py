@@ -212,14 +212,25 @@ def main():
         type=str,
         help="Specify a RegExp to filter input nd output modalities to process. default .*",
     )
+    parser.add_argument(
+        "--path_to_apis",
+        action="append",
+        type=str,
+        help="Specify a path to the api app .*",
+    )
     args = parser.parse_args()
 
     if args.name:
         return build_specific_envs(args.name)
 
+    if args.path_to_apis:
+        path_to_apis = args.path_to_apis
+    else:
+        path_to_apis = "/app/apis"
+
     return build_env_for_activated_tasks(
-        path_to_config_file="../config.json",
-        path_to_apis="../apis",
+        path_to_config_file=f"{path_to_apis}/../config.json",
+        path_to_apis=path_to_apis,
         modality=args.modality,
     )
 

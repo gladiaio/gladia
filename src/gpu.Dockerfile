@@ -96,12 +96,10 @@ RUN apt-key del 7fa2af80 && \
     micromamba shell init -s bash && \
     micromamba config set always_softlink $MAMBA_ALWAYS_SOFTLINK && \
     $PATH_TO_GLADIA_SRC/tools/docker/clean-layer.sh
-
-# Script which launches commands passed to "docker run"
-COPY  $PATH_TO_GLADIA_SRC/tools/docker/_activate_current_env.sh /usr/local/bin/
-
+  
 # Automatically activate micromaba for every bash shell
-RUN echo "source /usr/local/bin/_activate_current_env.sh" >> ~/.bashrc && \
+RUN mv $PATH_TO_GLADIA_SRC/tools/docker/_activate_current_env.sh /usr/local/bin/ && \
+    echo "source /usr/local/bin/_activate_current_env.sh" >> ~/.bashrc && \
     echo "source /usr/local/bin/_activate_current_env.sh" >> /etc/skel/.bashrc && \
     echo "micromamba activate server" >> ~/.bashrc
 

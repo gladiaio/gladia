@@ -282,6 +282,24 @@ def main(
     response = requests.get(f"{url}/openapi.json", headers=header)
     endpoints = response.json()
 
+    # if the specific endpoint is less
+    # then 4 it means it's looking to 
+    # have a input or input/output mod
+    # this should also help to handle 
+    # missing trailing /
+    these_specific_endpoints=[]
+    for specific_endpoint in specific_endpoints:
+        if len(specific_endpoint.split("/")) < 4:
+            for endpoint in endpoints["paths"].keys():
+                if endpoint.startswith(specific_endpoint):
+                    these_specific_endpoints.append(endpoint)
+    
+    if these_specific_endpoints != []:
+        specific_endpoints = list(dict.fromkeys(these_specific_endpoints))
+
+
+
+
     print()
     print(f"Testing endpoints")
     print()
@@ -297,21 +315,6 @@ def main(
 
     after_endpoint_continue = False
     test_final_status = ExitStatus_success
-
-    # if the specific endpoint is less
-    # then 4 it means it's looking to 
-    # have a input or input/output mod
-    # this should also help to handle 
-    # missing trailing /
-    these_specific_endpoints=[]
-    for specific_endpoint in specific_endpoints:
-        if specific_endpoint.split("/") < 4:
-            for endpoint in endpoints["paths"].keys():
-                if endpoint.startswith(specific_endpoint):
-                    these_specific_endpoints.append(endpoint)
-    
-    if these_specific_endpoints != []:
-        specific_endpoints = list(dict.fromkeys(these_specific_endpoints))
 
 
     for path, details in endpoints["paths"].items():

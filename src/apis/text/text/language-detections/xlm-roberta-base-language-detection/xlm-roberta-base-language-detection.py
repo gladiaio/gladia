@@ -1,4 +1,6 @@
 import numpy as np
+
+from typing import List, Dict, Any
 from gladia_api_utils.triton_helper import TritonClient, data_processing
 
 
@@ -6,7 +8,7 @@ def softmax(x):
     return np.exp(x) / np.sum(np.exp(x), axis=0)
 
 
-def predict(text: str) -> str:
+def predict(text: str) -> List[Dict[str, Any]]:
     """
     From a given text, return a json scoring the probability of the given text to be of a certain language
 

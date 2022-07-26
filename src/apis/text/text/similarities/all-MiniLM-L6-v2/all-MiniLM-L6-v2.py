@@ -1,4 +1,4 @@
-def predict(sentence_1: str, sentence_2: str) -> str:
+def predict(sentence_1: str, sentence_2: str) -> dict:
     """
     For two given sentences, say whether they are similar or not.
 
@@ -16,4 +16,4 @@ def predict(sentence_1: str, sentence_2: str) -> str:
 
     cosine_scores = util.pytorch_cos_sim(embedding1, embedding2)
 
-    return str(cosine_scores.item())
+    return {"score": cosine_scores.item()}

@@ -7,7 +7,7 @@ def predict(text: str) -> dict:
     For a given text, predict if it's POSITIVE, NEUTRAL or NEGATIVE
 
     :param text: text to analyze.
-    :return: JSON formatted str containing the label (POSITIVE/NEUTRAL/NEGATIVE) with it score
+    :return: Dict formatted dict containing the label (POSITIVE/NEUTRAL/NEGATIVE) with it score
     """
 
     classifier = pipeline("zero-shot-classification")

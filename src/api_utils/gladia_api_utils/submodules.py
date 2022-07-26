@@ -326,12 +326,14 @@ output = this_module.predict(**{kwargs})
 
 if isinstance(output, Image.Image):
     output.save('{output_tmp_result}', format='PNG')
+elif isinstance(output, bytes):
+    with open('{output_tmp_result}', 'wb') as f:
+        f.write(output)
 else:
     with open('{output_tmp_result}', 'w') as f:
         f.write(str(output))
 EOF
 """
-
                 try:
                     exec_in_custom_env(env_name=env_name, cmd=cmd)
 
@@ -361,9 +363,10 @@ EOF
                     model, f"{self.root_package_path}/{model}/{model}.py"
                 ).load_module()
 
-                # C'est ici qu'il lance le process sans venv
+                # This is where we launch the inference without custom env
                 result = getattr(this_module, f"predict")(*args, **kwargs)
             try:
+
                 return cast_response(result, self.output)
             except Exception as e:
                 print(e)
@@ -372,6 +375,7 @@ EOF
                     detail=f"The following error occurred: {str(e)}",
                 )
             finally:
+
                 if isinstance(result, str):
                     try:
                         if (

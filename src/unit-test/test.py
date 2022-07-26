@@ -86,21 +86,28 @@ def perform_test(
 
         if input == "image":
             params = (("model", model),)
-            files = {"image": ("test.jpg", open("test.jpg", "rb"))}
 
-            response = request_endpoint(
-                url=url,
-                path=path,
-                header=header,
-                params=params,
-                files=files,
-                max_retry=max_retry,
-            )
+            files_to_test = ["test.jpg", "test.png"]
+            valid = True
 
-            if response.status_code == 200:
+            for file_name in files_to_test:
+                files = {"image": (file_name, open(file_name, "rb"))}
+
+                response = request_endpoint(
+                    url=url,
+                    path=path,
+                    header=header,
+                    params=params,
+                    files=files,
+                    max_retry=max_retry,
+                )
+
+                if response.status_code != 200:
+                    valid = False
+
+            if valid:
                 nb_test_passed += 1
                 status = status_passed
-
             else:
                 nb_test_failed += 1
                 status = status_failed

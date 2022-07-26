@@ -120,7 +120,7 @@ class TritonClient:
         for arg, registered_input in zip(args, self.__registered_inputs):
             registered_input.set_data_from_numpy(arg)
 
-        if kwds.get("force_load", True) and os.getenv("TRITON_MODEL_LAZY_LOAD", True):
+        if kwds.get("force_load", True) and (os.getenv('TRITON_MODEL_LAZY_LOAD', 'True') == 'True'):
 
             for model_sub_part in self.__model_sub_parts:
                 response = requests.post(
@@ -138,7 +138,7 @@ class TritonClient:
             outputs=self.__registered_outputs,
         )
 
-        if kwds.get("force_unload", True) and os.getenv("TRITON_MODEL_LAZY_LOAD", True):
+        if kwds.get("force_unload", True) and (os.getenv('TRITON_MODEL_LAZY_LOAD', 'True') == 'True'):
 
             response = requests.post(
                 url=f"http://{self.__triton_server_url}/v2/repository/models/{self.__model_name}/unload",

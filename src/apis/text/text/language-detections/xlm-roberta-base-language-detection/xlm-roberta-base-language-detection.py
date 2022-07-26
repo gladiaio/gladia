@@ -1,6 +1,6 @@
-import numpy as np
+from typing import Any, Dict, List
 
-from typing import List, Dict, Any
+import numpy as np
 from gladia_api_utils.triton_helper import TritonClient, data_processing
 
 

@@ -1,10 +1,12 @@
 import importlib
+import json
 import os
 import pathlib
 import re
 import subprocess
 import sys
 import tempfile
+import urllib.parse
 import warnings
 from pathlib import Path
 from shlex import quote
@@ -128,20 +130,26 @@ def get_model_versions(root_path=None) -> dict:
     return versions, package_path
 
 
-def exec_in_custom_env(env_name: str, cmd: str):
-    cmd = f"micromamba activate {env_name} && {cmd}"
+def exec_in_subprocess(
+    env_name: str, module_path: str, model: str, output_tmp_result: str, **kwargs
+):
+
+    HERE = pathlib.Path(__file__).parent
+
+    cmd = f"""micromamba run -n {env_name} python {os.path.join(HERE, 'run_process.py')} {module_path} {model} {output_tmp_result} """
+    cmd += f"{quote(urllib.parse.quote(json.dumps(kwargs)))}"
 
     try:
-        full_cmd = f"""eval "$(micromamba shell hook --shell=bash)" && {cmd}"""
-
-        process = subprocess.Popen(
-            full_cmd,
+        proc = subprocess.Popen(
+            cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
+            stdin=subprocess.PIPE,
             shell=True,
             executable="/bin/bash",
         )
-        output, error = process.communicate()
+
+        output, error = proc.communicate()
 
         print("[error]:", error)
 
@@ -307,35 +315,14 @@ class TaskRouter:
                 model = quote(model)
                 output_tmp_result = quote(output_tmp_result)
 
-                cmd = f"""
-python - <<-EOF
-
-import os
-import importlib.util
-
-from PIL import Image
-
-os.environ['LD_LIBRARY_PATH'] = '/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/opt/conda/lib'
-
-spec = importlib.util.spec_from_file_location('{PATH_TO_GLADIA_SRC}/{module_path}', '{PATH_TO_GLADIA_SRC}/{module_path}/{model}.py')
-this_module = importlib.util.module_from_spec(spec)
-
-spec.loader.exec_module(this_module)
-
-output = this_module.predict(**{kwargs})
-
-if isinstance(output, Image.Image):
-    output.save('{output_tmp_result}', format='PNG')
-elif isinstance(output, bytes):
-    with open('{output_tmp_result}', 'wb') as f:
-        f.write(output)
-else:
-    with open('{output_tmp_result}', 'w') as f:
-        f.write(str(output))
-EOF
-"""
                 try:
-                    exec_in_custom_env(env_name=env_name, cmd=cmd)
+                    exec_in_subprocess(
+                        env_name=env_name,
+                        module_path=module_path,
+                        model=model,
+                        output_tmp_result=output_tmp_result,
+                        **kwargs,
+                    )
 
                 except Exception as e:
                     raise HTTPException(

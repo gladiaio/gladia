@@ -1,6 +1,6 @@
 import os
-import numpy as np
 
+import numpy as np
 from gladia_api_utils.triton_helper import TritonClient, data_processing
 
 
@@ -22,7 +22,28 @@ def predict(text: str) -> str:
         "language-detection_papluca_xlm-roberta-base-language-detection_tensorrt_tokenize",
     ]
 
-    LANGUAGES  = ["ja", "nl", "ar", "pl", "de", "it", "pt", "tr", "es", "hi", "el", "ur", "bg", "en", "fr", "zh", "ru", "th", "sw", "vi"]
+    LANGUAGES = [
+        "ja",
+        "nl",
+        "ar",
+        "pl",
+        "de",
+        "it",
+        "pt",
+        "tr",
+        "es",
+        "hi",
+        "el",
+        "ur",
+        "bg",
+        "en",
+        "fr",
+        "zh",
+        "ru",
+        "th",
+        "sw",
+        "vi",
+    ]
 
     client = TritonClient(
         model_name=MODEL_NAME,
@@ -37,4 +58,7 @@ def predict(text: str) -> str:
 
     output = softmax(client(np_output)[0][0])
 
-    return [{"language": language, "score": score} for (language, score) in zip(LANGUAGES, output)]
+    return [
+        {"language": language, "score": score}
+        for (language, score) in zip(LANGUAGES, output)
+    ]

@@ -49,8 +49,10 @@ def request_endpoint(url, path, header, params=False, files=False, max_retry=3):
             response = requests.post(
                 f"{url}{path}", headers=header, params=params, files=files
             )
-            
-            print(f"|  |       ___ Try : {tries}/{max_retry}    ({files[next(iter( files))][0]})")
+
+            print(
+                f"|  |       ___ Try : {tries}/{max_retry}    ({files[next(iter( files))][0]})"
+            )
         else:
             response = requests.post(f"{url}{path}", headers=header, params=params)
             print(f"|  |       ___ Try : {tries}/{max_retry}")
@@ -122,7 +124,7 @@ def perform_test(
 
             for file_name in files_to_test:
                 files = {"audio": (file_name, open(file_name, "rb"))}
-                
+
                 response = request_endpoint(
                     url=url,
                     path=path,

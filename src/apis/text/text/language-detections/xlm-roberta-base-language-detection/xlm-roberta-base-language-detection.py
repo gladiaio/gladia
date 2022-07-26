@@ -1,5 +1,3 @@
-import os
-
 import numpy as np
 from gladia_api_utils.triton_helper import TritonClient, data_processing
 

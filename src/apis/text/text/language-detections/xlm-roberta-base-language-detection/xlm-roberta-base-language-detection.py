@@ -47,7 +47,6 @@ def predict(text: str) -> str:
 
     client = TritonClient(
         model_name=MODEL_NAME,
-        current_path=os.path.split(__file__)[0],
         sub_parts=MODEL_SUB_PARTS,
         output_name="output",
     )

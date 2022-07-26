@@ -50,9 +50,12 @@ def request_endpoint(url, path, header, params=False, files=False, max_retry=3):
                 f"{url}{path}", headers=header, params=params, files=files
             )
 
+            print(
+                f"|  |       ___ Try : {tries}/{max_retry}    ({files[next(iter( files))][0]})"
+            )
         else:
             response = requests.post(f"{url}{path}", headers=header, params=params)
-        print(f"|  |       ___ Try : {tries}/{max_retry}")
+            print(f"|  |       ___ Try : {tries}/{max_retry}")
         print(f"|  |      |    |_ Response : {response.status_code} ")
         tries += 1
     print(f"|  |      |")
@@ -115,21 +118,28 @@ def perform_test(
 
         elif input == "audio":
             params = (("model", model),)
-            files = {"audio": ("test.mp3", open("test.mp3", "rb"))}
 
-            response = request_endpoint(
-                url=url,
-                path=path,
-                header=header,
-                params=params,
-                files=files,
-                max_retry=max_retry,
-            )
+            files_to_test = ["test.mp3", "test.wav", "test.m4a"]
+            valid = True
 
-            if response.status_code == 200:
+            for file_name in files_to_test:
+                files = {"audio": (file_name, open(file_name, "rb"))}
+
+                response = request_endpoint(
+                    url=url,
+                    path=path,
+                    header=header,
+                    params=params,
+                    files=files,
+                    max_retry=max_retry,
+                )
+
+                if response.status_code != 200:
+                    valid = False
+
+            if valid:
                 nb_test_passed += 1
                 status = status_passed
-
             else:
                 nb_test_failed += 1
                 status = status_failed

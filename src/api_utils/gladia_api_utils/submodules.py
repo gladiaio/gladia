@@ -14,7 +14,7 @@ from shlex import quote
 import forge
 import inflect
 import starlette
-from fastapi import APIRouter, File, HTTPException, Query, UploadFile, status, Body
+from fastapi import APIRouter, Body, File, HTTPException, Query, UploadFile, status
 from fastapi.responses import JSONResponse
 from pydantic import create_model
 
@@ -200,7 +200,9 @@ class TaskRouter:
             if input in ["image", "video", "audio"]:
                 input_list.append(forge.arg(input, type=UploadFile, default=File(...)))
             elif input == "text":
-                input_list.append(forge.arg("text", type=str, default=Body("default Text")))
+                input_list.append(
+                    forge.arg("text", type=str, default=Body("default Text"))
+                )
             elif input == "list":
                 input_list.append(forge.arg("list", type=list, default=list()))
             elif input == "dict":
@@ -222,7 +224,9 @@ class TaskRouter:
                 else:
                     input_list.append(
                         forge.arg(
-                            item["name"], type=item["type"], default=Body(item["default"])
+                            item["name"],
+                            type=item["type"],
+                            default=Body(item["default"]),
                         )
                     )
 

@@ -1,6 +1,7 @@
 import os
 import pathlib
 import sys
+import json
 from time import sleep
 from typing import Any
 from warnings import warn
@@ -44,6 +45,14 @@ class TritonClient:
         self.__model_name = model_name
         self.__model_sub_parts = kwargs.get("sub_parts", [])
 
+        self.__preload_model : bool = self.check_if_model_needs_to_be_preloaded()
+
+        if self.__preload_model:
+            if not self.load_model():
+                warn(f"{self.__model_name} has not been properly loaded. Setting back lazy load to True")
+
+                self.__preload_model = False
+
         self.__client = tritonclient.InferenceServerClient(
             url=self.__triton_server_url, verbose=False
         )
@@ -67,6 +76,54 @@ class TritonClient:
     def client(self):
         return self.__client
 
+    def load_model(self) -> bool:
+        """Requests triton to load the model
+
+        Returns:
+            bool: whether the model has been successfully loaded or not
+        """
+
+        for model_sub_part in self.__model_sub_parts:
+            response = requests.post(
+                url=f"http://{self.__triton_server_url}/v2/repository/models/{model_sub_part}/load",
+            )
+
+            if response.status_code != 200:
+                return False
+
+        response = requests.post(
+            url=f"http://{self.__triton_server_url}/v2/repository/models/{self.__model_name}/load"
+        )
+
+        return (response.status_code == 200)
+
+    def unload_model(self) -> bool:
+        """Requests triton to unload the model
+
+        Returns:
+            bool: whether the model has been successfully unloaded or not
+        """
+
+        successfully_unload_model: bool = True
+
+        response = requests.post(
+            url=f"http://{self.__triton_server_url}/v2/repository/models/{self.__model_name}/unload",
+            data={"unload_dependents": False},
+        )
+
+        if response.status_code != 200:
+            successfully_unload_model = False
+
+        for model_sub_part in self.__model_sub_parts:
+            response = requests.post(
+                url=f"http://{self.__triton_server_url}/v2/repository/models/{model_sub_part}/unload",
+            )
+
+            if response.status_code != 200:
+                successfully_unload_model = False
+
+        return successfully_unload_model
+
     def register_new_input(self, shape, datatype: str, **kwargs) -> None:
         """Add a new input to the triton inferer. Each input has to be registered before usage.
 
@@ -82,6 +139,24 @@ class TritonClient:
                 datatype=datatype,
             )
         )
+
+    def check_if_model_needs_to_be_preloaded(self) -> bool:
+        """Check if the model needs to be preloaded according to the GladIA's config file
+
+        Returns:
+            bool: whether the model needs to be preloaded
+        """
+        path_to_config_file = os.getenv("API_CONFIG_FILE", "config.json")
+
+        if not os.path.isfile(path_to_config_file):
+            warn(f"[TritonClient] Couldn't load config file {path_to_config_file}, setting __preload_model to False.")
+
+            return False
+    
+        with open(path_to_config_file, "r") as f:
+            config_file = json.load(f)
+        
+        return (self.__model_name in config_file["triton"]["models_to_preload"])
 
     def register_new_output(self, **kwargs) -> None:
         """Add a new output to the triton inferer. Each ouput has to be registered before usage.\n
@@ -128,19 +203,16 @@ class TritonClient:
             [Any]: List of outputs from the model
         """
 
+        del kwds
+
         for arg, registered_input in zip(args, self.__registered_inputs):
             registered_input.set_data_from_numpy(arg)
 
-        if kwds.get("force_load", True):
+        if not self.__preload_model:
+            if not self.load_model():
+                warn(f"{self.__model_name} has not been properly loaded. Returning empty response")
 
-            for model_sub_part in self.__model_sub_parts:
-                response = requests.post(
-                    url=f"http://{self.__triton_server_url}/v2/repository/models/{model_sub_part}/load",
-                )
-
-            requests.post(
-                url=f"http://{self.__triton_server_url}/v2/repository/models/{self.__model_name}/load"
-            )
+                return [[]]
 
         model_response = self.client.infer(
             self.__model_name,
@@ -149,20 +221,9 @@ class TritonClient:
             outputs=self.__registered_outputs,
         )
 
-        if kwds.get("force_unload", True):
-
-            response = requests.post(
-                url=f"http://{self.__triton_server_url}/v2/repository/models/{self.__model_name}/unload",
-                data={"unload_dependents": False},
-            )
-
-            for model_sub_part in self.__model_sub_parts:
-                response = requests.post(
-                    url=f"http://{self.__triton_server_url}/v2/repository/models/{model_sub_part}/unload",
-                )
-
-        if response.status_code != 200:
-            warn(f"{self.__model_name} has not been properly unloaded.")
+        if not self.__preload_model:
+            if not self.unload_model():
+                warn(f"{self.__model_name} has not been properly unloaded.")
 
         return [
             model_response.as_numpy(output.name()).tolist()

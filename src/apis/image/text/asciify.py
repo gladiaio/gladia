@@ -5,8 +5,8 @@ inputs = [
     {
         "type": "image",
         "name": "image",
-        "default": "Image to convert to ascii",
-        "placeholder": "Image to convert to ascii",
+        "default": "Image binary or image url to convert to ascii",
+        "placeholder": "Image binary or image url to convert to ascii",
         "tooltip": "Insert the image to convert to ascii",
     }
 ]

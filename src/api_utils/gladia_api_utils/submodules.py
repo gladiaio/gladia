@@ -191,6 +191,7 @@ class TaskRouter:
         if isinstance(input, str):
             if input in ["image", "video", "audio"]:
                 input_list.append(forge.arg(input, type=UploadFile, default=File(...)))
+                input_list.append(forge.arg("image_url", type=str, default=""))
             elif input == "text":
                 input_list.append(forge.arg("text", type=str, default="default Text"))
             elif input == "list":

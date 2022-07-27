@@ -179,7 +179,7 @@ def cast_response(response, expected_output: dict):
 
     elif isinstance(response, bool) or isinstance(response, float):
         return response
-    
+
     elif isinstance(response, int):
         return response
 

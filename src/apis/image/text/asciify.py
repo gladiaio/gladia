@@ -5,8 +5,8 @@ inputs = [
     {
         "type": "image",
         "name": "image",
-        "default": "Image to convert to ascii",
-        "placeholder": "Image to convert to ascii",
+        "default": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png",
+        "placeholder": "image url to convert to ascii if no file upload",
         "tooltip": "Insert the image to convert to ascii",
     }
 ]

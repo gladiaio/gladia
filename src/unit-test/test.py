@@ -155,13 +155,6 @@ def perform_test(
                 if response.status_code != 200:
                     valid = False
 
-            if valid:
-                nb_test_passed += 1
-                status = status_passed
-            else:
-                nb_test_failed += 1
-                status = status_failed
-                test_final_status = ExitStatus_failure
 
             # testing url ref for heavy modality
             files = {

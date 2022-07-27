@@ -4,7 +4,6 @@ import sys
 from time import sleep
 from typing import Any
 from warnings import warn
-from .helper import check_if_model_needs_to_be_preloaded
 
 import requests
 import tritonclient.http as tritonclient
@@ -45,7 +44,7 @@ class TritonClient:
         self.__model_name = model_name
         self.__model_sub_parts = kwargs.get("sub_parts", [])
 
-        self.__preload_model: bool = check_if_model_needs_to_be_preloaded(self.__model_name)
+        self.__preload_model: bool = kwargs.get("preload_model", False)
 
         if self.__preload_model and not self.load_model():
             warn(

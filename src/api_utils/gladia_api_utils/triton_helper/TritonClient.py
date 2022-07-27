@@ -1,7 +1,7 @@
+import json
 import os
 import pathlib
 import sys
-import json
 from time import sleep
 from typing import Any
 from warnings import warn
@@ -45,11 +45,13 @@ class TritonClient:
         self.__model_name = model_name
         self.__model_sub_parts = kwargs.get("sub_parts", [])
 
-        self.__preload_model : bool = self.check_if_model_needs_to_be_preloaded()
+        self.__preload_model: bool = self.check_if_model_needs_to_be_preloaded()
 
         if self.__preload_model:
             if not self.load_model():
-                warn(f"{self.__model_name} has not been properly loaded. Setting back lazy load to True")
+                warn(
+                    f"{self.__model_name} has not been properly loaded. Setting back lazy load to True"
+                )
 
                 self.__preload_model = False
 
@@ -95,7 +97,7 @@ class TritonClient:
             url=f"http://{self.__triton_server_url}/v2/repository/models/{self.__model_name}/load"
         )
 
-        return (response.status_code == 200)
+        return response.status_code == 200
 
     def unload_model(self) -> bool:
         """Requests triton to unload the model
@@ -149,19 +151,26 @@ class TritonClient:
         path_to_config_file = os.getenv("API_CONFIG_FILE", "config.json")
 
         if not os.path.isfile(path_to_config_file):
-            warn(f"[TritonClient] Couldn't load config file {path_to_config_file}, setting __preload_model to False.")
+            warn(
+                f"[TritonClient] Couldn't load config file {path_to_config_file}, setting __preload_model to False."
+            )
 
             return False
-    
+
         with open(path_to_config_file, "r") as f:
             config_file = json.load(f)
 
-        if "triton" not in config_file.keys() or "models_to_preload" not in config_file["triton"].keys():
-            warn(f"[TritonClient] Couldn't find 'models_to_preload' param key in the config file {path_to_config_file}, setting __preload_model to False.")
+        if (
+            "triton" not in config_file.keys()
+            or "models_to_preload" not in config_file["triton"].keys()
+        ):
+            warn(
+                f"[TritonClient] Couldn't find 'models_to_preload' param key in the config file {path_to_config_file}, setting __preload_model to False."
+            )
 
             return False
 
-        return (self.__model_name in config_file["triton"]["models_to_preload"])
+        return self.__model_name in config_file["triton"]["models_to_preload"]
 
     def register_new_output(self, **kwargs) -> None:
         """Add a new output to the triton inferer. Each ouput has to be registered before usage.\n
@@ -215,7 +224,9 @@ class TritonClient:
 
         if not self.__preload_model:
             if not self.load_model():
-                warn(f"{self.__model_name} has not been properly loaded. Returning empty response")
+                warn(
+                    f"{self.__model_name} has not been properly loaded. Returning empty response"
+                )
 
                 return [[]]
 

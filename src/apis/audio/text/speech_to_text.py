@@ -5,7 +5,7 @@ inputs = [
     {
         "type": "audio",
         "name": "audio",
-        "default": "Audio to transcribe",
+        "default": "https://anshe.org/audio/3Weeks-080715.mp3",
         "placeholder": "Image to transcribe",
         "tooltip": "Image to transcribe",
     },

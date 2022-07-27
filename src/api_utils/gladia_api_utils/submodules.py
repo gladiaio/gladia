@@ -1,3 +1,4 @@
+from email.policy import default
 import importlib
 import json
 import os
@@ -14,13 +15,17 @@ from shlex import quote
 import forge
 import inflect
 import starlette
-from fastapi import APIRouter, File, HTTPException, Query, UploadFile, status
+from fastapi import APIRouter, File, HTTPException, Query, UploadFile, status, Body
 from fastapi.responses import JSONResponse
 from pydantic import create_model
+from typing import Union
 
 from .casting import cast_response
 from .file_management import write_tmp_file
 from .responses import AudioResponse, ImageResponse, VideoResponse
+from icecream import ic
+from urllib.request import urlopen
+ic.configureOutput(includeContext=True)
 
 versions = list()
 available_versions = list()
@@ -198,10 +203,10 @@ class TaskRouter:
 
         if isinstance(input, str):
             if input in ["image", "video", "audio"]:
-                input_list.append(forge.arg(input, type=UploadFile, default=File(...)))
-                input_list.append(forge.arg("image_url", type=str, default=""))
+                input_list.append(forge.arg(input, type=Union[UploadFile, None], default=File(None)))
+                input_list.append(forge.arg(f"{input}_url", type=str, default=Body(description="File URL if no file upload")))
             elif input == "text":
-                input_list.append(forge.arg("text", type=str, default="default Text"))
+                input_list.append(forge.arg("text", type=str, default=Body(default="", description="")))
             elif input == "list":
                 input_list.append(forge.arg("list", type=list, default=list()))
             elif input == "dict":
@@ -217,8 +222,21 @@ class TaskRouter:
                     item["type"] = float
 
                 if item["type"] in ["image", "audio", "video"]:
+                    arg_name = item["name"]
+
                     input_list.append(
-                        forge.arg(item["name"], type=UploadFile, default=File(...))
+                        forge.arg(arg_name, type=Union[UploadFile, None], default=File(None))
+                    )
+                    arg_name_url = arg_name + "_url"
+
+                    input_list.append(
+                        forge.arg(arg_name_url, 
+                            type=str, 
+                            default=Body(
+                                default=item["default"],
+                                description="File URL if no file upload"
+                                )
+                            )
                     )
                 else:
                     input_list.append(
@@ -291,6 +309,25 @@ class TaskRouter:
 
             env_name = get_module_env_name(module_path)
 
+            routeur = singularize(self.root_package_path)
+            this_routeur = importlib.import_module(routeur.replace("/", "."))
+            inputs = this_routeur.inputs
+
+            # if input in kwargs has heavy modality (image/sound/video)
+            # and if url not empty => wget image
+            # and make it a byte stream
+            input_files = list()
+            for input in inputs:
+                # heavy modality
+                if input["type"] in ["image", "audio", "video"]:
+                    input_name = input["name"]
+                    if kwargs[f"{input_name}_url"]:
+                        url = kwargs[f"{input_name}_url"]
+                        kwargs[input_name] = urlopen(url).read()
+                        
+                        del kwargs[f"{input_name}_url"]
+
+            # if its a subprocess
             if env_name is not None:
                 routeur = singularize(self.root_package_path)
 
@@ -302,7 +339,7 @@ class TaskRouter:
                 # input_files to clean
                 input_files = list()
                 for input in inputs:
-                    if input["type"] in ["image", "sound", "video"]:
+                    if input["type"] in ["image", "audio", "video"]:
                         tmp_file = write_tmp_file(kwargs[input["name"]])
                         kwargs[input["name"]] = tmp_file
                         input_files.append(tmp_file)

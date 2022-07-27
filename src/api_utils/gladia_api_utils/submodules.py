@@ -14,7 +14,7 @@ import inflect
 import starlette
 from fastapi import APIRouter, File, HTTPException, Query, UploadFile, status, Body
 from fastapi.responses import JSONResponse
-from pydantic import create_model, BaseModel
+from pydantic import create_model
 
 from .casting import cast_response
 from .file_management import write_tmp_file
@@ -165,8 +165,6 @@ def get_module_env_name(module_path: str) -> str:
     else:
         return None
 
-class Text(BaseModel):
-    text: str
 
 class TaskRouter:
     def __init__(self, router: APIRouter, input, output, default_model: str):
@@ -190,19 +188,15 @@ class TaskRouter:
 
         input_list = list()
 
-        print('input-show', input)
-
         if isinstance(input, str):
             if input in ["image", "video", "audio"]:
                 input_list.append(forge.arg(input, type=UploadFile, default=File(...)))
             elif input == "text":
-                print("textext", file=sys.stderr)
-                input_list.append(forge.arg("text", type=Body, default=Body("default Text")))
+                input_list.append(forge.arg("text", type=str, default=Body("default Text")))
             elif input == "list":
                 input_list.append(forge.arg("list", type=list, default=list()))
             elif input == "dict":
                 input_list.append(forge.arg("dict", type=dict, default=dict()))
-
 
         elif isinstance(input, list):
             for item in input:
@@ -231,8 +225,6 @@ class TaskRouter:
                 default=Query(self.default_model, enum=set(self.versions.keys())),
             )
         )
-
-        print('input_list', input_list, file=sys.stderr)
 
         @router.get(
             "/",
@@ -269,11 +261,6 @@ class TaskRouter:
         )
         @forge.sign(*input_list)
         async def apply(*args, **kwargs):
-        # async def apply(text: str=Body(), *args, **kwargs):
-
-            # print('text', text)
-            print('args', args, file=sys.stderr)
-            print('kwargs', kwargs, file=sys.stderr)
 
             for key, value in kwargs.items():
                 if isinstance(value, starlette.datastructures.UploadFile):
@@ -284,11 +271,6 @@ class TaskRouter:
             # avoid passing the model to the predict function
             # therefor removing it from the kwargs
             del kwargs["model"]
-
-            print("coucoucou")
-            for kwarg in kwargs:
-                print('kwarg', kwarg, file=sys.stderr)
-                kwarg = Body(kwarg)
 
             module_path = f"{self.root_package_path}/{model}/"
 

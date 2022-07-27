@@ -1,7 +1,5 @@
-
-import os
 import json
-
+import os
 from warnings import warn
 
 

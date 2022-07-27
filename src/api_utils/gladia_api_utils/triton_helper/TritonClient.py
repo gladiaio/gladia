@@ -4,12 +4,12 @@ import sys
 from time import sleep
 from typing import Any
 from warnings import warn
-from .helper import check_if_model_needs_to_be_preloaded
 
 import requests
 import tritonclient.http as tritonclient
 
 from .download_active_models import download_triton_model
+from .helper import check_if_model_needs_to_be_preloaded
 
 
 class TritonClient:
@@ -45,7 +45,9 @@ class TritonClient:
         self.__model_name = model_name
         self.__model_sub_parts = kwargs.get("sub_parts", [])
 
-        self.__preload_model: bool = check_if_model_needs_to_be_preloaded(self.__model_name)
+        self.__preload_model: bool = check_if_model_needs_to_be_preloaded(
+            self.__model_name
+        )
 
         if self.__preload_model and not self.load_model():
             warn(
@@ -140,7 +142,6 @@ class TritonClient:
                 datatype=datatype,
             )
         )
-
 
     def register_new_output(self, **kwargs) -> None:
         """Add a new output to the triton inferer. Each ouput has to be registered before usage.\n

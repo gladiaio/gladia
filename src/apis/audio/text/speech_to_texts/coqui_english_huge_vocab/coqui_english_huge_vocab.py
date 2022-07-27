@@ -10,9 +10,9 @@ engine = SpeechToTextEngine(
 
 
 def predict(audio: bytes, language: str = "en") -> str:
-    
+
     audio = _open(audio)
-    
+
     text = engine.run(audio)
 
     return text

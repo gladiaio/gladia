@@ -1,4 +1,3 @@
-from email.policy import default
 import importlib
 import json
 import os
@@ -9,22 +8,24 @@ import sys
 import tempfile
 import urllib.parse
 import warnings
+from email.policy import default
 from pathlib import Path
 from shlex import quote
+from typing import Union
+from urllib.request import urlopen
 
 import forge
 import inflect
 import starlette
-from fastapi import APIRouter, File, HTTPException, Query, UploadFile, status, Body
+from fastapi import APIRouter, Body, File, HTTPException, Query, UploadFile, status
 from fastapi.responses import JSONResponse
+from icecream import ic
 from pydantic import create_model
-from typing import Union
 
 from .casting import cast_response
 from .file_management import write_tmp_file
 from .responses import AudioResponse, ImageResponse, VideoResponse
-from icecream import ic
-from urllib.request import urlopen
+
 ic.configureOutput(includeContext=True)
 
 versions = list()
@@ -203,10 +204,22 @@ class TaskRouter:
 
         if isinstance(input, str):
             if input in ["image", "video", "audio"]:
-                input_list.append(forge.arg(input, type=Union[UploadFile, None], default=File(None)))
-                input_list.append(forge.arg(f"{input}_url", type=str, default=Body(description="File URL if no file upload")))
+                input_list.append(
+                    forge.arg(input, type=Union[UploadFile, None], default=File(None))
+                )
+                input_list.append(
+                    forge.arg(
+                        f"{input}_url",
+                        type=str,
+                        default=Body(description="File URL if no file upload"),
+                    )
+                )
             elif input == "text":
-                input_list.append(forge.arg("text", type=str, default=Body(default="", description="")))
+                input_list.append(
+                    forge.arg(
+                        "text", type=str, default=Body(default="", description="")
+                    )
+                )
             elif input == "list":
                 input_list.append(forge.arg("list", type=list, default=list()))
             elif input == "dict":
@@ -225,18 +238,21 @@ class TaskRouter:
                     arg_name = item["name"]
 
                     input_list.append(
-                        forge.arg(arg_name, type=Union[UploadFile, None], default=File(None))
+                        forge.arg(
+                            arg_name, type=Union[UploadFile, None], default=File(None)
+                        )
                     )
                     arg_name_url = arg_name + "_url"
 
                     input_list.append(
-                        forge.arg(arg_name_url, 
-                            type=str, 
+                        forge.arg(
+                            arg_name_url,
+                            type=str,
                             default=Body(
                                 default=item["default"],
-                                description="File URL if no file upload"
-                                )
-                            )
+                                description="File URL if no file upload",
+                            ),
+                        )
                     )
                 else:
                     input_list.append(
@@ -324,7 +340,7 @@ class TaskRouter:
                     if kwargs[f"{input_name}_url"]:
                         url = kwargs[f"{input_name}_url"]
                         kwargs[input_name] = urlopen(url).read()
-                        
+
                         del kwargs[f"{input_name}_url"]
 
             # if its a subprocess

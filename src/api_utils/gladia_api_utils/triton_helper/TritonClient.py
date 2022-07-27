@@ -47,13 +47,12 @@ class TritonClient:
 
         self.__preload_model: bool = self.check_if_model_needs_to_be_preloaded()
 
-        if self.__preload_model:
-            if not self.load_model():
-                warn(
-                    f"{self.__model_name} has not been properly loaded. Setting back lazy load to True"
-                )
+        if self.__preload_model and not self.load_model():
+            warn(
+                f"{self.__model_name} has not been properly loaded. Setting back lazy load to True"
+            )
 
-                self.__preload_model = False
+            self.__preload_model = False
 
         self.__client = tritonclient.InferenceServerClient(
             url=self.__triton_server_url, verbose=False
@@ -222,13 +221,12 @@ class TritonClient:
         for arg, registered_input in zip(args, self.__registered_inputs):
             registered_input.set_data_from_numpy(arg)
 
-        if not self.__preload_model:
-            if not self.load_model():
-                warn(
-                    f"{self.__model_name} has not been properly loaded. Returning empty response"
-                )
+        if not self.__preload_model and not self.load_model():
+            warn(
+                f"{self.__model_name} has not been properly loaded. Returning empty response"
+            )
 
-                return [[]]
+            return [[]]
 
         model_response = self.client.infer(
             self.__model_name,
@@ -237,9 +235,8 @@ class TritonClient:
             outputs=self.__registered_outputs,
         )
 
-        if not self.__preload_model:
-            if not self.unload_model():
-                warn(f"{self.__model_name} has not been properly unloaded.")
+        if not self.__preload_model and not self.unload_model():
+            warn(f"{self.__model_name} has not been properly unloaded.")
 
         return [
             model_response.as_numpy(output.name()).tolist()

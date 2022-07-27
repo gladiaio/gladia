@@ -1,6 +1,10 @@
 import os
 
-from gladia_api_utils.triton_helper import TritonClient, data_processing, check_if_model_needs_to_be_preloaded
+from gladia_api_utils.triton_helper import (
+    TritonClient,
+    check_if_model_needs_to_be_preloaded,
+    data_processing,
+)
 
 
 def predict(text: str) -> str:
@@ -22,7 +26,7 @@ def predict(text: str) -> str:
         current_path=os.path.split(__file__)[0],
         sub_parts=MODEL_SUB_PARTS,
         output_name="output",
-        preload_model=check_if_model_needs_to_be_preloaded(MODEL_NAME)
+        preload_model=check_if_model_needs_to_be_preloaded(MODEL_NAME),
     )
 
     numpy_input = data_processing.text_to_numpy(text)

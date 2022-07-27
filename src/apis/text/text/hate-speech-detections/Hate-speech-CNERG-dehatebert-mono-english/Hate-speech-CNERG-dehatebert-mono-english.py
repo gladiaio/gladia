@@ -1,7 +1,9 @@
 import numpy as np
-
+from gladia_api_utils.triton_helper import (
+    TritonClient,
+    check_if_model_needs_to_be_preloaded,
+)
 from transformers import BertTokenizer
-from gladia_api_utils.triton_helper import TritonClient, check_if_model_needs_to_be_preloaded
 
 
 def predict(text: str) -> str:
@@ -18,7 +20,7 @@ def predict(text: str) -> str:
 
     client = TritonClient(
         model_name=MODEL_NAME,
-        preload_model=check_if_model_needs_to_be_preloaded(MODEL_NAME)
+        preload_model=check_if_model_needs_to_be_preloaded(MODEL_NAME),
     )
 
     tokenizer = BertTokenizer.from_pretrained(TOKENIZER_NAME)

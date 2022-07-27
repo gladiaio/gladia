@@ -155,7 +155,12 @@ class TritonClient:
     
         with open(path_to_config_file, "r") as f:
             config_file = json.load(f)
-        
+
+        if "triton" not in config_file.keys() or "models_to_preload" not in config_file["triton"].keys():
+            warn(f"[TritonClient] Couldn't find 'models_to_preload' param key in the config file {path_to_config_file}, setting __preload_model to False.")
+
+            return False
+
         return (self.__model_name in config_file["triton"]["models_to_preload"])
 
     def register_new_output(self, **kwargs) -> None:

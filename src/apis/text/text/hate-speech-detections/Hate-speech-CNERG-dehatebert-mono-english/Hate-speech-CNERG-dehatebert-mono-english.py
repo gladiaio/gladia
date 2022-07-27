@@ -1,17 +1,9 @@
-import os
-
 import numpy as np
-import requests
-from gladia_api_utils.triton_helper import TritonClient
+from gladia_api_utils.triton_helper import (
+    TritonClient,
+    check_if_model_needs_to_be_preloaded,
+)
 from transformers import BertTokenizer
-
-# from time import sleep
-
-
-# import tritonclient.http as tritonclient
-
-
-# from gladia_api_utils.triton_helper import download_triton_model
 
 
 def predict(text: str) -> str:
@@ -27,7 +19,8 @@ def predict(text: str) -> str:
     TOKENIZER_NAME = "Hate-speech-CNERG/bert-base-uncased-hatexplain"
 
     client = TritonClient(
-        model_name=MODEL_NAME, current_path=os.path.split(__file__)[0]
+        model_name=MODEL_NAME,
+        preload_model=check_if_model_needs_to_be_preloaded(MODEL_NAME),
     )
 
     tokenizer = BertTokenizer.from_pretrained(TOKENIZER_NAME)

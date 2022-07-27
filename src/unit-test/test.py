@@ -40,18 +40,18 @@ def get_nb_models(url, path, header):
     return len(models)
 
 
-def request_endpoint(url, path, header, params=False, files=False, max_retry=3):
+def request_endpoint(url, path, header, params=False, data={}, files=False, max_retry=3):
     response = type("", (), {})()
     response.status_code = 500
     tries = 1
     while tries <= max_retry and response.status_code != 200:
         if params != False and files != False:
             response = requests.post(
-                f"{url}{path}", headers=header, params=params, files=files
+                f"{url}{path}", headers=header, params=params, data=data, files=files
             )
 
         else:
-            response = requests.post(f"{url}{path}", headers=header, params=params)
+            response = requests.post(f"{url}{path}", headers=header, data=data, params=params)
         print(f"|  |       ___ Try : {tries}/{max_retry}")
         print(f"|  |      |    |_ Response : {response.status_code} ")
         tries += 1
@@ -136,17 +136,13 @@ def perform_test(
                 test_final_status = ExitStatus_failure
 
         elif input == "text":
-            params = [("model", model)]
-
-            for parameter in details["post"]["parameters"]:
-                if parameter["schema"]["title"] != "Model":
-                    params.append(
-                        (parameter["schema"]["title"], parameter["schema"]["default"])
-                    )
-
-            params = tuple(params)
+            params = {"model": model}
+            request_body_info = details["post"]["requestBody"]["content"]["application/json"]["schema"]
+            data={
+                request_body_info["title"]: request_body_info["default"]
+            }
             response = request_endpoint(
-                url=url, path=path, header=header, params=params, max_retry=max_retry
+                url=url, path=path, header=header, params=params, data=data,  max_retry=max_retry
             )
 
             if response.status_code == 200:

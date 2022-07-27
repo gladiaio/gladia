@@ -1,9 +1,9 @@
-def predict(sentence: str) -> str:
+def predict(sentence: str) -> dict:
     """
     For a given sentence, predict the next word.
 
     :param sentence: sentence to continue
-    :return: word predicted
+    :return: word predicted and score
     """
 
     from happytransformer import HappyWordPrediction
@@ -14,4 +14,4 @@ def predict(sentence: str) -> str:
 
     del happy_wp
 
-    return result[0].token
+    return {"prediction": result[0].token, "score": result[0].score}

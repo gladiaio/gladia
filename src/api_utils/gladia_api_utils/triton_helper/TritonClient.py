@@ -140,7 +140,6 @@ class TritonClient:
             )
         )
 
-
     def register_new_output(self, **kwargs) -> None:
         """Add a new output to the triton inferer. Each ouput has to be registered before usage.\n
         By default one ouput named `output__0` is already registered.

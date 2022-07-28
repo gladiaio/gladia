@@ -1,1 +1,0 @@
-docker run -it -p 8889:8080 -v $PWD:/gladia gladiaio/gladia

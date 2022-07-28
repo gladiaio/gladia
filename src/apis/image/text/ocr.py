@@ -5,7 +5,7 @@ inputs = [
     {
         "type": "image",
         "name": "image",
-        "default": "Image to extract text from",
+        "default": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png",
         "placeholder": "Image to extract text from",
         "tooltip": "Insert the image to extract text from",
     },

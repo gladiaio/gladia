@@ -49,10 +49,10 @@ def request_endpoint(url, path, header, params=False, files=False, max_retry=3):
             response = requests.post(
                 f"{url}{path}", headers=header, params=params, files=files
             )
-
-            print(
-                f"|  |       ___ Try : {tries}/{max_retry}    ({files[next(iter( files))][0]})"
-            )
+            file = files[next(iter(files))][0]
+            if file is None:
+                file = "url"
+            print(f"|  |       ___ Try : {tries}/{max_retry}    ({file})")
         else:
             response = requests.post(f"{url}{path}", headers=header, params=params)
             print(f"|  |       ___ Try : {tries}/{max_retry}")
@@ -108,6 +108,24 @@ def perform_test(
                 if response.status_code != 200:
                     valid = False
 
+            # testing url ref for heavy modality
+            files = {
+                "image_url": (
+                    None,
+                    "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png",
+                ),
+            }
+            response = request_endpoint(
+                url=url,
+                path=path,
+                header=header,
+                params=params,
+                files=files,
+                max_retry=max_retry,
+            )
+            if response.status_code != 200:
+                valid = False
+
             if valid:
                 nb_test_passed += 1
                 status = status_passed
@@ -136,6 +154,21 @@ def perform_test(
 
                 if response.status_code != 200:
                     valid = False
+
+            # testing url ref for heavy modality
+            files = {
+                "audio_url": (None, "https://anshe.org/audio/3Weeks-080715.mp3"),
+            }
+            response = request_endpoint(
+                url=url,
+                path=path,
+                header=header,
+                params=params,
+                files=files,
+                max_retry=max_retry,
+            )
+            if response.status_code != 200:
+                valid = False
 
             if valid:
                 nb_test_passed += 1

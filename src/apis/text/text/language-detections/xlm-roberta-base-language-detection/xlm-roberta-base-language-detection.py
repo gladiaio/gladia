@@ -1,7 +1,11 @@
 from typing import Any, Dict, List
 
 import numpy as np
-from gladia_api_utils.triton_helper import TritonClient, data_processing
+from gladia_api_utils.triton_helper import (
+    TritonClient,
+    check_if_model_needs_to_be_preloaded,
+    data_processing,
+)
 
 
 def softmax(x):
@@ -49,6 +53,7 @@ def predict(text: str) -> List[Dict[str, Any]]:
         model_name=MODEL_NAME,
         sub_parts=MODEL_SUB_PARTS,
         output_name="output",
+        preload_model=check_if_model_needs_to_be_preloaded(MODEL_NAME),
     )
 
     np_output = data_processing.text_to_numpy(text)

@@ -42,7 +42,9 @@ def get_nb_models(url, path, header):
     return len(models)
 
 
-def request_endpoint(url, path, header, params=False, data={}, files=False, max_retry=3):
+def request_endpoint(
+    url, path, header, params=False, data={}, files=False, max_retry=3
+):
     response = type("", (), {})()
     response.status_code = 500
     tries = 1
@@ -196,7 +198,12 @@ def perform_test(
                     data[value['title']]=value['default']
                 
             response = request_endpoint(
-                url=url, path=path, header=header, params=params, data=data,  max_retry=max_retry
+                url=url,
+                path=path,
+                header=header,
+                params=params,
+                data=data,
+                max_retry=max_retry,
             )
 
             if response.status_code == 200:

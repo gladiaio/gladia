@@ -44,6 +44,15 @@ class TritonClient:
         self.__model_name = model_name
         self.__model_sub_parts = kwargs.get("sub_parts", [])
 
+        self.__preload_model: bool = kwargs.get("preload_model", False)
+
+        if self.__preload_model and not self.load_model():
+            warn(
+                f"{self.__model_name} has not been properly loaded. Setting back lazy load to True"
+            )
+
+            self.__preload_model = False
+
         self.__client = tritonclient.InferenceServerClient(
             url=self.__triton_server_url, verbose=False
         )
@@ -66,6 +75,54 @@ class TritonClient:
     @property
     def client(self):
         return self.__client
+
+    def load_model(self) -> bool:
+        """Requests triton to load the model
+
+        Returns:
+            bool: whether the model has been successfully loaded or not
+        """
+
+        for model_sub_part in self.__model_sub_parts:
+            response = requests.post(
+                url=f"http://{self.__triton_server_url}/v2/repository/models/{model_sub_part}/load",
+            )
+
+            if response.status_code != 200:
+                return False
+
+        response = requests.post(
+            url=f"http://{self.__triton_server_url}/v2/repository/models/{self.__model_name}/load"
+        )
+
+        return response.status_code == 200
+
+    def unload_model(self) -> bool:
+        """Requests triton to unload the model
+
+        Returns:
+            bool: whether the model has been successfully unloaded or not
+        """
+
+        successfully_unload_model: bool = True
+
+        response = requests.post(
+            url=f"http://{self.__triton_server_url}/v2/repository/models/{self.__model_name}/unload",
+            data={"unload_dependents": False},
+        )
+
+        if response.status_code != 200:
+            successfully_unload_model = False
+
+        for model_sub_part in self.__model_sub_parts:
+            response = requests.post(
+                url=f"http://{self.__triton_server_url}/v2/repository/models/{model_sub_part}/unload",
+            )
+
+            if response.status_code != 200:
+                successfully_unload_model = False
+
+        return successfully_unload_model
 
     def register_new_input(self, shape, datatype: str, **kwargs) -> None:
         """Add a new input to the triton inferer. Each input has to be registered before usage.
@@ -128,19 +185,17 @@ class TritonClient:
             [Any]: List of outputs from the model
         """
 
+        del kwds
+
         for arg, registered_input in zip(args, self.__registered_inputs):
             registered_input.set_data_from_numpy(arg)
 
-        if kwds.get("force_load", True):
-
-            for model_sub_part in self.__model_sub_parts:
-                response = requests.post(
-                    url=f"http://{self.__triton_server_url}/v2/repository/models/{model_sub_part}/load",
-                )
-
-            requests.post(
-                url=f"http://{self.__triton_server_url}/v2/repository/models/{self.__model_name}/load"
+        if not self.__preload_model and not self.load_model():
+            warn(
+                f"{self.__model_name} has not been properly loaded. Returning empty response"
             )
+
+            return [[]]
 
         model_response = self.client.infer(
             self.__model_name,
@@ -149,19 +204,7 @@ class TritonClient:
             outputs=self.__registered_outputs,
         )
 
-        if kwds.get("force_unload", True):
-
-            response = requests.post(
-                url=f"http://{self.__triton_server_url}/v2/repository/models/{self.__model_name}/unload",
-                data={"unload_dependents": False},
-            )
-
-            for model_sub_part in self.__model_sub_parts:
-                response = requests.post(
-                    url=f"http://{self.__triton_server_url}/v2/repository/models/{model_sub_part}/unload",
-                )
-
-        if response.status_code != 200:
+        if not self.__preload_model and not self.unload_model():
             warn(f"{self.__model_name} has not been properly unloaded.")
 
         return [

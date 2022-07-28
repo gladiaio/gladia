@@ -29,7 +29,7 @@ def predict(text: str) -> str:
         text, return_tensors="pt", max_length=256, padding="max_length"
     ).input_ids
 
-    client.register_new_input(shape=(1, 256), datatype="INT32")
+    client.set_input(shape=(1, 256), datatype="INT32")
     output = client(input_ids.detach().numpy().astype(np.int32))[0]
 
     out = LABELS[np.argmax(output)]

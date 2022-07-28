@@ -99,7 +99,8 @@
             "language-detection_papluca_xlm-roberta-base-language-detection_tensorrt_inference",
             "named-entity-recognition_dbmdz_bert-large-cased-finetuned-conll03-english_tensorrt_inference",
             "sentiment-analyses_nlptown_bert-base-multilingual-uncased-sentiment_tensorrt_inference",
-            "hate-speech-detection_bert-base-uncased-hatexplain_base_traced"
+            "hate-speech-detection_bert-base-uncased-hatexplain_base_traced",
+            "sentence-transformers_all-MiniLM-L6-v2_tensorrt_inference"
         ]
     }
 }

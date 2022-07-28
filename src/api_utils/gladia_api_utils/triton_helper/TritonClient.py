@@ -57,7 +57,7 @@ class TritonClient:
             url=self.__triton_server_url, verbose=False
         )
 
-        self.__registered_inputs = []
+        self.__registered_inputs = {}
 
         self.__registered_outputs = [
             tritonclient.InferRequestedOutput(
@@ -124,7 +124,7 @@ class TritonClient:
 
         return successfully_unload_model
 
-    def register_new_input(self, shape, datatype: str, **kwargs) -> None:
+    def set_input(self, shape, datatype: str, **kwargs) -> None:
         """Add a new input to the triton inferer. Each input has to be registered before usage.
 
         Args:
@@ -132,13 +132,13 @@ class TritonClient:
             datatype (str): datatype of the input to register
         """
 
-        self.__registered_inputs.append(
-            tritonclient.InferInput(
-                name=kwargs.get("name", f"input__{len(self.__registered_inputs)}"),
-                shape=shape,
-                datatype=datatype,
-            )
+        input_name = kwargs.get("name", f"input__{len(self.__registered_inputs)}")
+        self.__registered_inputs[input_name] = tritonclient.InferInput(
+            name=input_name, shape=shape, datatype=datatype
         )
+
+    def unset_input(self, input_name: str):
+        del self.__registered_inputs[input_name]
 
     def register_new_output(self, **kwargs) -> None:
         """Add a new output to the triton inferer. Each ouput has to be registered before usage.\n
@@ -187,7 +187,7 @@ class TritonClient:
 
         del kwds
 
-        for arg, registered_input in zip(args, self.__registered_inputs):
+        for arg, registered_input in zip(args, self.__registered_inputs.values()):
             registered_input.set_data_from_numpy(arg)
 
         if not self.__preload_model and not self.load_model():
@@ -200,7 +200,7 @@ class TritonClient:
         model_response = self.client.infer(
             self.__model_name,
             model_version="1",
-            inputs=self.__registered_inputs,
+            inputs=self.__registered_inputs.values(),
             outputs=self.__registered_outputs,
         )
 

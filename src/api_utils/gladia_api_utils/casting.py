@@ -157,7 +157,7 @@ def cast_response(response, expected_output: dict):
         else:
             return json.loads(json.dumps(response, cls=NpEncoder, ensure_ascii=False))
 
-    if isinstance(response, Image.Image):
+    elif isinstance(response, Image.Image):
         return __convert_pillow_image_response(response)
 
     elif isinstance(response, np.ndarray):
@@ -168,6 +168,7 @@ def cast_response(response, expected_output: dict):
 
     elif isinstance(response, io.IOBase):
         return __convert_io_response(response, expected_output["type"])
+
     elif isinstance(response, (list, dict)):
         return json.loads(
             json.dumps(response, cls=NpEncoder, ensure_ascii=False).encode("utf8")
@@ -177,6 +178,9 @@ def cast_response(response, expected_output: dict):
         return __convert_string_response(response)
 
     elif isinstance(response, bool) or isinstance(response, float):
+        return response
+
+    elif isinstance(response, int):
         return response
 
     warn(f"Response type not supported ({type(response)}), returning a stream")

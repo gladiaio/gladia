@@ -9,6 +9,7 @@ global nb_total_tests
 global nb_test_ran, nb_test_passed, nb_test_failed, nb_test_skipped
 global test_final_status
 global status_passed, status_failed, status_skipped
+global endpoints
 
 status_passed = "🟢"
 status_skipped = "🟡"
@@ -18,6 +19,7 @@ status_failed = "🔴"
 ExitStatus_failure = 1
 ExitStatus_success = 0
 
+current_directory = os.path.dirname(os.path.abspath(__file__))
 
 def get_nb_tests(url, header, endpoints, specific_endpoints=[], specific_models=""):
     nb_total_tests = 0
@@ -71,6 +73,7 @@ def perform_test(
     global status_passed, status_failed, status_skipped
     global nb_total_tests
     global IS_CI
+    global endpoints
 
     tag = details["get"]["tags"][0]
 
@@ -94,7 +97,8 @@ def perform_test(
             valid = True
 
             for file_name in files_to_test:
-                files = {"image": (file_name, open(file_name, "rb"))}
+                file_path = os.path.join(current_directory, file_name)
+                files = {"image": (file_name, open(file_path, "rb"))}
 
                 response = request_endpoint(
                     url=url,
@@ -141,7 +145,8 @@ def perform_test(
             valid = True
 
             for file_name in files_to_test:
-                files = {"audio": (file_name, open(file_name, "rb"))}
+                file_path = os.path.join(current_directory, file_name)
+                files = {"audio": (file_name, open(file_path, "rb"))}
 
                 response = request_endpoint(
                     url=url,
@@ -181,9 +186,15 @@ def perform_test(
         elif input == "text":
             params = {"model": model}
             request_body_info = details["post"]["requestBody"]["content"]["application/json"]["schema"]
-            data={
-                request_body_info["title"]: request_body_info["default"]
-            }
+            data={}
+            if "title" in request_body_info:
+                data[request_body_info["title"]]= request_body_info["default"]
+            else:
+                schema = request_body_info['$ref'].split('/')[-1]
+                properties = endpoints["components"]["schemas"][schema]['properties']
+                for key, value in properties.items():
+                    data[value['title']]=value['default']
+                
             response = request_endpoint(
                 url=url, path=path, header=header, params=params, data=data,  max_retry=max_retry
             )
@@ -315,6 +326,9 @@ def main(
     github_token,
     github_pull_request,
 ):
+
+    global endpoints
+
     skip_when_failed = not continue_when_failed
     if specific_endpoints:
         specific_endpoints = specific_endpoints.split(",")
@@ -375,7 +389,7 @@ def main(
                     path,
                     skip_when_failed,
                     max_retry,
-                    specific_models,
+                    specific_models
                 )
 
             elif after_endpoint != "":

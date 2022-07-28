@@ -8,7 +8,13 @@ from torch.nn.functional import normalize
 
 
 def cos_sim(a: list, b: list):
-    """ """
+    """
+    For two given sentences embeddings a and b, computes the cosine similarity
+
+    :param sentence_1: first sentence embeddings to compare
+    :param sentence_2: second sentence embeddings to compare
+    :return: tensor with similarity score (between 0 and 1)
+    """
     return mm(
         normalize(tensor(a), p=2, dim=1),
         normalize(tensor(b), p=2, dim=1).transpose(0, 1),

@@ -399,7 +399,7 @@ def main(
                     path,
                     skip_when_failed,
                     max_retry,
-                    specific_models
+                    specific_models,
                 )
 
             elif after_endpoint != "":

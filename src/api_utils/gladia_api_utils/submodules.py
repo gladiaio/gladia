@@ -48,12 +48,14 @@ def is_valid_path(string: str):
     else:
         return False
 
+
 # take several dictionaries in input and return a merged one
 def merge_dicts(*args: dict):
     sum_items = list()
     for dictionary in args:
         sum_items += list(dictionary.items())
     return dict(sum_items)
+
 
 def singularize(word):
     if inflect.engine().singular_noun(word):
@@ -134,7 +136,7 @@ def get_model_versions(root_path=None) -> dict:
             metadata_file_name = ".metadata.json"
             metadata_file_path = os.path.join(package_path, fname, metadata_file_name)
             if pathlib.Path(metadata_file_path).exists():
-                with open(metadata_file_path, 'r') as metadata_file:
+                with open(metadata_file_path, "r") as metadata_file:
                     model_metadata = json.load(metadata_file)
                     versions[fname] = merge_dicts(versions[fname], model_metadata)
 
@@ -279,7 +281,7 @@ class TaskRouter:
         )
 
         # Define the get roads implented by fastapi
-        # The @router.get() content define the informations 
+        # The @router.get() content define the informations
         # displayed in /docs and /openapi.json for the get roads
         @router.get(
             "/",
@@ -309,7 +311,7 @@ class TaskRouter:
             }
 
         # Define the post roads implented by fastapi
-        # The @router.post() content define the informations 
+        # The @router.post() content define the informations
         # displayed in /docs and /openapi.json for the post roads
         @router.post(
             "/",

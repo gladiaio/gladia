@@ -39,7 +39,7 @@ def get_nb_tests(url, header, endpoints, specific_endpoints=[], specific_models=
 
 def get_nb_models(url, path, header):
     response = requests.get(f"{url}{path}", headers=header)
-    models = response.json()
+    models = response.json()["models"]
     return len(models)
 
 
@@ -84,7 +84,7 @@ def perform_test(
         models = specific_models
     else:
         response = requests.get(f"{url}{path}", headers=header)
-        models = response.json()
+        models = response.json()["models"]
 
     for model in models:
         if IS_CI:

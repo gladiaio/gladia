@@ -1,16 +1,21 @@
 {
-    "paper": {
-        "title": "",
-        "link": ""
-    },
-    "authors": [""],
-    "licente": {
-        "title": "",
-        "content": ""
-    },
-    "summary": "",
-    "latency": "" ,
+  "paper": {
+    "title": "",
+    "link": "",
+    "authors": []
+  },
+  "license": {
+    "title": "",
+    "link": "",
+    "content": ""
+  },
+  "api": {
+    "content": "",
+    "tags": []
+  },
+  "gladia": {
+    "latency": "",
     "format": "",
-    "accelerator": "",
-    "gladia": {}
+    "accelerator": ""
+  }
 }

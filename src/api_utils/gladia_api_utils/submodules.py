@@ -139,9 +139,39 @@ def get_model_versions(root_path=None) -> dict:
                 with open(metadata_file_path, "r") as metadata_file:
                     model_metadata = json.load(metadata_file)
                     versions[fname] = merge_dicts(versions[fname], model_metadata)
+            else:
+                metadata_file_path = os.path.join("apis", ".metadata_model_template.json")
+                with open(metadata_file_path, "r") as metadata_file:
+                    model_metadata = json.load(metadata_file)
+                    versions[fname] = merge_dicts(versions[fname], model_metadata)
 
     return versions, package_path
 
+
+def get_task_dir_relpath_from_py_file(py_rel_path):
+    # Remove extension
+    rel_path = py_rel_path.replace('.py', '')
+    # Pluralize last part corresponding to the task
+    rel_path = rel_path.split('/')
+    rel_path[-1]=pluralize(rel_path[-1])
+    rel_path = '/'.join(rel_path)
+    return rel_path
+
+
+def get_task_metadata(rel_path):
+    # Retieve metadata from metadata file and push it to versions,
+    # the output of the get road
+    rel_path = get_task_dir_relpath_from_py_file(rel_path)
+    metadata_file_name = ".metadata.json"
+    metadata_file_path = os.path.join(rel_path, metadata_file_name)
+    if not pathlib.Path(metadata_file_path).exists():
+        metadata_file_path = os.path.join("apis", ".metadata_model_template.json")
+    else:
+        metadata_file_path = os.path.join(rel_path, metadata_file_name)
+    with open(metadata_file_path, "r") as metadata_file:
+        task_metadata = json.load(metadata_file)
+    return task_metadata
+    
 
 def exec_in_subprocess(
     env_name: str, module_path: str, model: str, output_tmp_result: str, **kwargs
@@ -164,7 +194,7 @@ def exec_in_subprocess(
 
         output, error = proc.communicate()
 
-        print("[error]:", error)
+        print("[error]:", error, file=sys.stderr)
 
     except subprocess.CalledProcessError as error:
         raise RuntimeError(f"Couldn't activate custom env {env_name}: {error}")
@@ -280,7 +310,7 @@ class TaskRouter:
             )
         )
 
-        # Define the get routes implented by fastapi
+        # Define the get routes implemented by fastapi
         # The @router.get() content define the informations
         # displayed in /docs and /openapi.json for the get routes
         @router.get(
@@ -290,7 +320,10 @@ class TaskRouter:
         )
         # This function send bask the get road content to the caller
         async def get_versions():
-            return self.versions
+            task_metadata = get_task_metadata(rel_path)
+            get_content = {'models': self.versions}
+            get_content = merge_dicts(get_content, task_metadata)
+            return get_content
 
         response_classes = {
             "image": ImageResponse,
@@ -310,7 +343,7 @@ class TaskRouter:
                 }
             }
 
-        # Define the post routes implented by fastapi
+        # Define the post routes implemented by fastapi
         # The @router.post() content define the informations
         # displayed in /docs and /openapi.json for the post routes
         @router.post(
@@ -428,7 +461,7 @@ class TaskRouter:
 
                 return cast_response(result, self.output)
             except Exception as e:
-                print(e)
+                print(e, file=sys.stderr)
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail=f"The following error occurred: {str(e)}",

@@ -140,7 +140,9 @@ def get_model_versions(root_path=None) -> dict:
                     model_metadata = json.load(metadata_file)
                     versions[fname] = merge_dicts(versions[fname], model_metadata)
             else:
-                metadata_file_path = os.path.join("apis", ".metadata_model_template.json")
+                metadata_file_path = os.path.join(
+                    "apis", ".metadata_model_template.json"
+                )
                 with open(metadata_file_path, "r") as metadata_file:
                     model_metadata = json.load(metadata_file)
                     versions[fname] = merge_dicts(versions[fname], model_metadata)
@@ -150,11 +152,11 @@ def get_model_versions(root_path=None) -> dict:
 
 def get_task_dir_relpath_from_py_file(py_rel_path):
     # Remove extension
-    rel_path = py_rel_path.replace('.py', '')
+    rel_path = py_rel_path.replace(".py", "")
     # Pluralize last part corresponding to the task
-    rel_path = rel_path.split('/')
-    rel_path[-1]=pluralize(rel_path[-1])
-    rel_path = '/'.join(rel_path)
+    rel_path = rel_path.split("/")
+    rel_path[-1] = pluralize(rel_path[-1])
+    rel_path = "/".join(rel_path)
     return rel_path
 
 
@@ -171,7 +173,7 @@ def get_task_metadata(rel_path):
     with open(metadata_file_path, "r") as metadata_file:
         task_metadata = json.load(metadata_file)
     return task_metadata
-    
+
 
 def exec_in_subprocess(
     env_name: str, module_path: str, model: str, output_tmp_result: str, **kwargs
@@ -321,7 +323,7 @@ class TaskRouter:
         # This function send bask the get road content to the caller
         async def get_versions():
             task_metadata = get_task_metadata(rel_path)
-            get_content = {'models': self.versions}
+            get_content = {"models": self.versions}
             get_content = merge_dicts(get_content, task_metadata)
             return get_content
 

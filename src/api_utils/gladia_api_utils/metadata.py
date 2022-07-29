@@ -1,15 +1,16 @@
 import os
-import shutil
 import pathlib
+import shutil
 import sys
 
 dir_ignore = ["__pycache__"]
 root_path = os.getcwd()
 
+
 def manage_metadata_files(argv):
 
-    delete = True if 'delete' in argv else False
-    
+    delete = True if "delete" in argv else False
+
     model_paths = []
     task_paths = []
 
@@ -31,17 +32,24 @@ def manage_metadata_files(argv):
                         task_dir_path = os.path.join(output_dir_path, task_dir)
                         if os.path.isdir(task_dir_path) and task_dir not in dir_ignore:
                             model_dir_list = os.listdir(task_dir_path)
-                            if model_dir_list != ['.empty']:
+                            if model_dir_list != [".empty"]:
                                 task_paths.append(task_dir_path)
                             # /apis/<input>/<output>/<task>/<model>/
                             for model in model_dir_list:
                                 model_path = os.path.join(task_dir_path, model)
-                                if os.path.isdir(model_path) and model not in dir_ignore:
+                                if (
+                                    os.path.isdir(model_path)
+                                    and model not in dir_ignore
+                                ):
                                     model_paths.append(model_path)
 
-    source_task_metadata_path = os.path.join(root_path, "apis/.metadata_task_template.json")
-    source_model_metadata_path = os.path.join(root_path, "apis/.metadata_model_template.json")
-    destination_file_name = '.metadata.json'
+    source_task_metadata_path = os.path.join(
+        root_path, "apis/.metadata_task_template.json"
+    )
+    source_model_metadata_path = os.path.join(
+        root_path, "apis/.metadata_model_template.json"
+    )
+    destination_file_name = ".metadata.json"
 
     # Create or delete task metadata files
     for task_path in task_paths:
@@ -62,6 +70,7 @@ def manage_metadata_files(argv):
             to_delete_file_path = os.path.join(model_path, destination_file_name)
             if pathlib.Path(to_delete_file_path).exists():
                 os.remove(to_delete_file_path)
+
 
 if __name__ == "__main__":
     manage_metadata_files(sys.argv)

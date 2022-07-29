@@ -2,6 +2,7 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 from time import time
 
 
@@ -129,7 +130,10 @@ def download_triton_model(triton_models_dir: str, git_path: str) -> None:
     """
 
     if not os.path.exists(git_path):
+        print(f"{git_path} does not exist", file=sys.stderr)
         return
+
+    print("we are in download_triton_model", file=sys.stderr)
 
     git_url = open(git_path).read()
 
@@ -149,7 +153,7 @@ def download_triton_model(triton_models_dir: str, git_path: str) -> None:
 
         shutil.move(os.path.join(clone_to_path, filename), triton_models_dir)
 
-    shutil.rmtree(clone_to_path)
+    # shutil.rmtree(clone_to_path)
 
 
 def download_active_triton_models(

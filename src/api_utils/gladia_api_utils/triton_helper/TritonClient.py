@@ -46,6 +46,13 @@ class TritonClient:
 
         self.__preload_model: bool = kwargs.get("preload_model", False)
 
+        if os.getenv("TRITON_MODELS_PATH") == "":
+            warn(
+                "[DEBUG] TRITON_MODELS_PATH is not set, please specify it in order to be able to download models."
+            )
+
+        self.__download_model(os.path.join(self.__current_path, ".git_path"))
+
         if self.__preload_model and not self.load_model():
             warn(
                 f"{self.__model_name} has not been properly loaded. Setting back lazy load to True"
@@ -64,13 +71,6 @@ class TritonClient:
                 name=kwargs.get("output_name", "output__0")
             )
         ]
-
-        if os.getenv("TRITON_MODELS_PATH") == "":
-            warn(
-                "[DEBUG] TRITON_MODELS_PATH is not set, please specify it in order to be able to download models."
-            )
-
-        self.__download_model(os.path.join(self.__current_path, ".git_path"))
 
     @property
     def client(self):

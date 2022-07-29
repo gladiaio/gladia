@@ -12,6 +12,7 @@ inputs = [
         "tooltip": "Insert the text to summarize here",
     }
 ]
+# TODO : check why it takes the default
 
 output = {
     "name": "keywords",

@@ -16,5 +16,8 @@ inputs = [
 output = {"name": "generated_text", "type": "str", "example": "generated_text"}
 
 TaskRouter(
-    router=router, input=inputs, output=output, default_model="toftrup-etal-2021"
+    router=router,
+    input=inputs,
+    output=output,
+    default_model="xlm-roberta-base-language-detection",
 )

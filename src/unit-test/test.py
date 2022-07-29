@@ -21,6 +21,7 @@ ExitStatus_success = 0
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 
+
 def get_nb_tests(url, header, endpoints, specific_endpoints=[], specific_models=""):
     nb_total_tests = 0
     for path, details in endpoints["paths"].items():
@@ -187,16 +188,18 @@ def perform_test(
 
         elif input == "text":
             params = {"model": model}
-            request_body_info = details["post"]["requestBody"]["content"]["application/json"]["schema"]
-            data={}
+            request_body_info = details["post"]["requestBody"]["content"][
+                "application/json"
+            ]["schema"]
+            data = {}
             if "title" in request_body_info:
-                data[request_body_info["title"]]= request_body_info["default"]
+                data[request_body_info["title"]] = request_body_info["default"]
             else:
-                schema = request_body_info['$ref'].split('/')[-1]
-                properties = endpoints["components"]["schemas"][schema]['properties']
+                schema = request_body_info["$ref"].split("/")[-1]
+                properties = endpoints["components"]["schemas"][schema]["properties"]
                 for key, value in properties.items():
-                    data[value['title']]=value['default']
-                
+                    data[value["title"]] = value["default"]
+
             response = request_endpoint(
                 url=url,
                 path=path,

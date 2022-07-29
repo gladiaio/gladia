@@ -47,7 +47,7 @@ The `docker build` command may take some time to run since it is building the co
 Please see the [Claap video](https://app.claap.io/gladia/howto101-start-a-container-using-your-own-image-c-IPbrCarAMH-F_dxT_URkA7L).
 
 ```bash
-> docker run -it --gpus all -e CUDA_VISIBLE_DEVICES=0 -v $PWD:/app oboulant/mamba /bin/bash
+> docker run -it --gpus all -e CUDA_VISIBLE_DEVICES=0 --shm-size 8g -p 8080:8080 -v $PWD:/app oboulant/mamba /bin/bash
 ```
 
 Few comments :
@@ -55,6 +55,8 @@ Few comments :
 * `-it`  tells docker to start the container in interactive mode
 * `--gpus all` make docker being able to see all gpus
 * `-e CUDA_VISIBLE_DEVICES=<GPU_ID>` Enable the designated GPU to be used for the docker application. Without this the application will assume all GPUs can be provisioned. You can list the available GPUs using the command
+* `--shm-size 8g` Increase shared memory to 8 gigabits in order to process some models
+* `-p 8080:8080` Publish the 8080 port in order to access it from your navigator if necessary
 
 ```bash
 > nvidia-smi

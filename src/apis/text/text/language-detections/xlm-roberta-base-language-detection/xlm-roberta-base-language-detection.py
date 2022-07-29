@@ -58,7 +58,7 @@ def predict(text: str) -> List[Dict[str, Any]]:
 
     np_output = data_processing.text_to_numpy(text)
 
-    client.register_new_input(name="TEXT", shape=np_output.shape, datatype="BYTES")
+    client.set_input(name="TEXT", shape=np_output.shape, datatype="BYTES")
 
     output = softmax(client(np_output)[0][0])
 

@@ -31,7 +31,7 @@ def predict(text: str) -> str:
 
     numpy_input = data_processing.text_to_numpy(text)
 
-    client.register_new_input(name="TEXT", shape=numpy_input.shape, datatype="BYTES")
+    client.set_input(name="TEXT", shape=numpy_input.shape, datatype="BYTES")
 
     output = client(numpy_input)[0][0]
 

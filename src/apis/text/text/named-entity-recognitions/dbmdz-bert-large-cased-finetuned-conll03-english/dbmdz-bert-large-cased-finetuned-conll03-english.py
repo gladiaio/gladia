@@ -43,7 +43,7 @@ def predict(text: str) -> List[dict]:
 
     np_output = data_processing.text_to_numpy(text)
 
-    client.register_new_input(name="TEXT", shape=np_output.shape, datatype="BYTES")
+    client.set_input(name="TEXT", shape=np_output.shape, datatype="BYTES")
 
     output = client(np_output)[0].decode("utf8")
 

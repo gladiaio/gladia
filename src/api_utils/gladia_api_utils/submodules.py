@@ -280,9 +280,9 @@ class TaskRouter:
             )
         )
 
-        # Define the get roads implented by fastapi
+        # Define the get routes implented by fastapi
         # The @router.get() content define the informations
-        # displayed in /docs and /openapi.json for the get roads
+        # displayed in /docs and /openapi.json for the get routes
         @router.get(
             "/",
             summary=f"Get list of models available for {self.task}",
@@ -310,9 +310,9 @@ class TaskRouter:
                 }
             }
 
-        # Define the post roads implented by fastapi
+        # Define the post routes implented by fastapi
         # The @router.post() content define the informations
-        # displayed in /docs and /openapi.json for the post roads
+        # displayed in /docs and /openapi.json for the post routes
         @router.post(
             "/",
             summary=f"Apply model for the {self.task} task for a given models",

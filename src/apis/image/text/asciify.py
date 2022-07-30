@@ -5,7 +5,7 @@ inputs = [
     {
         "type": "image",
         "name": "image",
-        "default": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png",
+        "default": "http://files.gladia.io/test/test.png",
         "placeholder": "image url to convert to ascii if no file upload",
         "tooltip": "Insert the image to convert to ascii",
     }

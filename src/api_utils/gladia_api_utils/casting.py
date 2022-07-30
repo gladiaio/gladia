@@ -178,10 +178,10 @@ def cast_response(response, expected_output: dict):
         return __convert_string_response(response)
 
     elif isinstance(response, bool) or isinstance(response, float):
-        return response
+        return {"prediction": str(response)}
 
     elif isinstance(response, int):
-        return response
+        return {"prediction": str(response)}
 
     warn(f"Response type not supported ({type(response)}), returning a stream")
 

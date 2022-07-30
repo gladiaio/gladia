@@ -1,13 +1,16 @@
 import os
-from importlib.machinery import SourceFileLoader
-from pathlib import Path
-
-import easyargs
 import inflect
+import logging
+import easyargs
 import inquirer
+
+from pathlib import Path
+from importlib.machinery import SourceFileLoader
 from inquirer.themes import GreenPassion
 
+
 p = inflect.engine()
+logger = logging.getLogger(__name__)
 
 
 def task_exists(input_type, output_type, task_name):
@@ -24,11 +27,11 @@ def task_exists(input_type, output_type, task_name):
     output = True
 
     if not os.path.exists(task_routeur_path):
-        print(f"Missing {task_routeur_path} ; I will build it for you")
+        logger.debug(f"{task_routeur_path} is missing, it will be added later on.")
         output = False
 
     if not os.path.exists(task_path):
-        print(f"Missing {task_path} ; I will build it for you")
+        logger.debug(f"{task_path} is missing, it will be added later on.")
         output = False
 
     return output
@@ -48,19 +51,15 @@ def model_exists(input_type, output_type, task_name, model_name):
 
     output = True
     if not Path(model_path).exists():
-        print(f"Missing {model_path} ; I will build it for you")
+        logger.debug(f"{model_path} is missing, it will be added later on.")
         output = False
 
     if not Path(os.path.join(model_path, "__init__.py")).exists():
-        print(
-            f"Missing {os.path.join(model_path, '__init__.py')} ; I will build it for you"
-        )
+        logger.debug(f"{os.path.join(model_path, '__init__.py')} is missing, it will be added later on.")
         output = False
 
     if not Path(os.path.join(model_path, f"{model_name}.py")).exists():
-        print(
-            f"Missing {os.path.join(model_path, f'{model_name}.py')} ; I will build it for you"
-        )
+        logger.debug(f"{os.path.join(model_path, f'{model_name}.py')} is missing, it will be added later on.")
         output = False
 
     return output
@@ -313,18 +312,25 @@ def scaffold_task():
         ]
         added_element = dict()
         added_element["element"] = None
+
         while added_element["element"] != "done":
+
             added_element = inquirer.prompt(add_element, theme=GreenPassion())
+
             if added_element["element"] == "input":
                 inputs.append(inquirer.prompt(set_input, theme=GreenPassion()))
+
             elif added_element["element"] == "output":
                 output = inquirer.prompt(set_output, theme=GreenPassion())
+
             else:
                 create_task_routeur(input_type, output_type, task_name, inputs, output)
-                print("done defining environment")
+
+                logger.info("Environement successfully defined")
+
 
     else:
-        print(f"Task {task_name} already exists")
+        logger.debug(f"Task {task_name} already exists.")
 
     return input_type, output_type, task_name, inputs, output
 
@@ -345,7 +351,8 @@ def scaffold_model(input_type, output_type, task_name, inputs, output):
             input_type, output_type, task_name, model_name, inputs, output
         )
     else:
-        print(f"Model {model_name} already exists")
+        logger.debug(f"Model {model_name} already exists")
+
     return model_file
 
 
@@ -354,4 +361,4 @@ if __name__ == "__main__":
     input_type, output_type, task_name, inputs, output = scaffold_task()
     model_file = scaffold_model(input_type, output_type, task_name, inputs, output)
 
-    print(f"you can now edit {model_file}")
+    logger.info(f"Scaffold succeeds: {model_file}")

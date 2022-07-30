@@ -1,3 +1,4 @@
+from distutils.log import warn
 import importlib
 import json
 import logging
@@ -27,7 +28,7 @@ def __init_config() -> dict:
     config_file = os.getenv("API_CONFIG_FILE", "config.json")
 
     if os.path.isfile(config_file):
-        with open("config.json", "r") as f:
+        with open("config.json", "r") as f: # FIXME: config_file is unused
             return json.load(f)
 
 
@@ -40,11 +41,35 @@ def __init_logging(api_config: dict) -> logging.Logger:
     """
 
     try:
-        logging.basicConfig(level=logging.INFO, format=api_config["logs"]["log_format"])
+        
+        logging.basicConfig(
+            level={
+                None: logging.NOTSET,
+                "": logging.NOTSET,
+                "none": logging.NOTSET,
+                "debug": logging.DEBUG,
+                "info": logging.INFO,
+                "warning": logging.WARNING,
+                "error": logging.ERROR,
+                "critical": logging.CRITICAL,
+            }.get(api_config["logs"]["log_level"], logging.INFO),
+            format=api_config["logs"]["log_format"]
+        )
+
     except KeyError:
         logging.basicConfig(level=logging.INFO)
 
-    return logging.getLogger(__name__)
+    logger = logging.getLogger(__name__)
+
+    handler = logging.handlers.RotatingFileHandler(
+        api_config["logs"]["log_path"],
+        maxBytes=2000,
+        backupCount=10,
+    )
+
+    logger.addHandler(handler)
+
+    return logger
 
 
 def __init_prometheus_instrumentator(instrumentator_config: dict) -> Instrumentator:

@@ -3,11 +3,12 @@ import os
 import random
 import string
 import sys
+import logging
 import tempfile
 from pathlib import Path
 from urllib.parse import urlparse
-from uuid import uuid4
 
+from uuid import uuid4
 import gdown
 import magic
 import requests
@@ -15,6 +16,9 @@ from icecream import ic
 from PIL import Image
 from xtract import XZ, BZip2, GZip, Rar, Tar, Zip, xtract
 from xtract.utils import get_file_type
+
+
+logger = logging.getLogger(__name__)
 
 
 def write_tmp_file(content):
@@ -44,8 +48,8 @@ def input_to_files(func):
 
         try:
             remove_all_tmp_file(tmp_files)
-        except:
-            print("Error while deleting temp files")
+        except Exception as e:
+            logger.error("Couldn't delete tmp files:", e)
 
         return result
 
@@ -86,7 +90,9 @@ def download_file(
 
 def write_url_content_to_file(file_full_path: Path, url) -> bool:
     data = requests.get(url).content
-    print(f"writing {url} to {file_full_path}")
+
+    logger.debug(f"writing {url} to {file_full_path}")
+
     return write_to_file(file_full_path, data)
 
 
